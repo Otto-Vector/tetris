@@ -6,8 +6,9 @@ var color_light = 'rgb(255, 255, 255)',
 	 timer = true, //глобально для прекращения цикла
 	 lines = [], //массив для контроля строк
 	 score = 0,//переменная количества собранных линий
-	 figure_index = 0; //активация переменной индекса рандомного объекта
-	 z_object = [0,0,0,0]; //активация массива активной фигуры
+	 figure_index = 0, //активация переменной индекса рандомного объекта
+	 z_object = [0,0,0,0], //активация массива активной фигуры
+	 interface_next_figure_array = [];
 
 //базовые данные
 var figure_constant = [
@@ -70,16 +71,32 @@ function line_control_array()
 		}
 	}
 
+function interface_next_figure()
+	{
+		var index1 = 0;
+		for (var i = 7; i < 11; i++)
+		{
+			for (var j = 12; j < 19; j++)
+			{
+				interface_next_figure_array[index1]= j+i*colrow;
+				index1++;
+			}
+		}
+	}
+
 /////активация нового объекта///////
+figure_index = Math.floor((Math.random()*figure.length));//случайный индекс объекта
+var previous_index;
 function active_z()
 {
-figure_index = Math.floor((Math.random()*figure.length));//случайный индекс объекта
+	previous_index = figure_index; //костыль для rotatera
 	for (var i=0; i < 4; i++)//присвоение активному объекту значения буферной переменной
 		z_object[i] = figure[figure_index][i];
+//	console.log("From z Begin = "+figure_index);
 	//поворот изначального состояния объекта
-	rotate_index = 0;//обнуление поворота
-	var rand = Math.floor((Math.random()*5));//случайное положение поворота
-	for (var i=0; i < rand; i++) rotater(z_object);
+	// rotate_index = 0;//обнуление поворота
+	// var rand = Math.floor((Math.random()*5));//случайное положение поворота
+	// for (var i=0; i < rand; i++) rotater(z_object);
 
 	//прорисовка объекта
 	for (var i=0; i < 4; i++)
@@ -87,6 +104,17 @@ figure_index = Math.floor((Math.random()*figure.length));//случайный и
 
 	//поднятие фигуры, если она отрисовалась при повороте ниже
 	direct('up',z_object);
+
+	//зачистка пространства в интерфейсе следующей фигуры
+	for (var i=0; i < interface_next_figure_array.length; i++)
+		colored($(".dot").get(interface_next_figure_array[i]), color_dark);
+
+	figure_index = Math.floor((Math.random()*figure.length));
+	
+//	console.log("From z END = "+figure_index);
+	//прорисовка справа следующей фигуры
+	for (var i=0; i < 4; i++)
+		colored($(".dot").get(figure[figure_index][i]+(colrow*7)+10), color_light);
 }
 
 ///////////////////ИСПОЛНИТЕЛЬНЫЙ БЛОК///////////////////////////////
@@ -94,7 +122,8 @@ $(document).ready(function() {
 
 //	active_z(); //активация первой фигуры
 	line_control_array(); //создание массива line
-	$($(".dot").get(18)).html(score);//вывод очков
+	interface_next_figure(); //создание массива для зачистки поля вывода следующей фигуры
+	$($(".dot").get(38)).html(score);//вывод очков
 
 // 	$(".dot").bind({ //рисование на поле
 // 		mouseenter: function() {colorSwitch(this)}
@@ -149,8 +178,8 @@ $(document).ready(function() {
 	{
 		//зацикливание индекса поворота 1-2-3-0 //и смена его значения на ++
 		rotate_index = (rotate_index !== 3) ? ++rotate_index : 0;
-		var turn = figure_rotater[figure_index][rotate_index];//уменьшение размера переменной
-
+		var turn = figure_rotater[previous_index][rotate_index];//уменьшение размера переменной
+//		console.log("From rotater = "+figure_index);
 		//проверка на столкновение с препятствиями
 		var min_left = 1,	min = 1,	min_bottom = 1;
 		for (var i=0; i < 4; i++)
@@ -260,7 +289,7 @@ function line_control()
 					$($(".dot").get(lines[i][j])).toggleClass('wall',false);//убираем значение wall
 				}
 				score++;//прибавляем очко
-				$($(".dot").get(18)).html(score); //выводим значение собраных линий на экран
+				$($(".dot").get(38)).html(score); //выводим значение собраных линий на экран
 
 				var line_to_switch = new Array(),//объявление рабочего внутрициклового буферного массива
 						line_i = 0; //индекс для этого же массива
