@@ -227,6 +227,9 @@ $(document).ready(function() {
 		//передача управления новому объекту при окончательном падении объекта
 		if ((min_bottom == 0 || min == 0) && to == 'down')
 		{
+			//сначала проверяем game_over
+			if (zero_line_overflow()) console.log('GAME OVER!!!');
+			//
 			for (var i=0; i < 4; i++)
 			$($(".dot").get(what[i])).toggleClass('wall',true);//объект превращается в wall
 			line_control();//запуск считывания линий
@@ -254,14 +257,15 @@ $(document).ready(function() {
 
 function line_control()
 	{
-		var line_complete;
+		var line_complete; //определение переменной проверки линии
 		for (var i=19; i > -1; i--)
 		{
-			line_complete = 0;
+			line_complete = 0; //обнуление переменной на каждой строке
 			for (var j=0; j < 10; j++)
-			{
+			{//прибавление значения, если присутствует значение 'wall'
 				line_complete = ($($(".dot").get(lines[i][j])).attr("class") == 'dot wall') ? ++line_complete : line_complete;
 			}
+			//если все десять значений в линии совпадают, то запускается событие перерисовки
 			if (line_complete == 10)
 			{	duration = '1s';//костылёк анимации
 				for (var j=0; j < 10; j++) //убираем первую строку
@@ -270,46 +274,57 @@ function line_control()
 					$($(".dot").get(lines[i][j])).toggleClass('wall',false);//убираем значение wall
 				}
 				score++;//прибавляем очко
-				$($(".dot").get(18)).html(score);
-				//перенос всего материала вниз на одну строку
+				$($(".dot").get(18)).html(score); //выводим значение собраных линий на экран
 
-				//считываем
-				var line_to_switch = new Array(),
-					line_i=0;
+				var line_to_switch = new Array(),//объявление рабочего внутрициклового буферного массива
+						line_i = 0; //индекс для этого же массива
 
+				//считываем данные о состояни остальных "полос" в буферный массив
+				//над (ii=i-1) убраной линией
 				for (var ii=i-1; ii > -1; ii--)
 					for (var j=0; j < 10; j++)
-					{
-						//[i]=line_i;
+					{//присвоение значений классов в массив
 						line_to_switch[line_i]=$($(".dot").get(lines[ii][j])).attr("class");
-						line_i++;
+						line_i++; //добавление индекса массива
 					}
 
-				//зачищаем
+
 				duration = '0s'; //костылёк анимации
-				var fist_line_animation=true;
-				for (var ii=i-1; ii > -1; ii--)
+
+				//зачищаем пространство над (ii=i-1) убраной линией
+				for (var ii=i-1; ii > -1; ii--) 
 				{
 					for (var j=0; j < 10; j++)
 					{
-						$($(".dot").get(lines[ii][j])).toggleClass('wall',false);
-						colored($(".dot").get(lines[ii][j]), color_dark, updown);//анимация сокращения строки
+						$($(".dot").get(lines[ii][j])).toggleClass('wall',false);//стираем значения 'wall'
+						colored($(".dot").get(lines[ii][j]), color_dark, updown);//перекрашивание поля в цвет фона
 					}
 				}
 
-				//рисуем на row вниз
-				line_i=0;
+				line_i=0; //обнуляем индекс массива с данными об остальных линиях
+				//рисуем на row вниз (ii=i)
 				for (var ii=i; ii > -1; ii--)
 					for (var j=0; j < 10; j++)
-					{
+					{	//присвоение значений классов из массива
 						$($(".dot").get(lines[ii][j])).attr("class", line_to_switch[line_i]);
+						//немедленная окраска значений 'dot wall'
 						if (line_to_switch[line_i] == "dot wall")
 							colored($(".dot").get(lines[ii][j]), color_light, updown);
-						line_i++;
+						line_i++;//переход на следующий индекс буферного массива
 					}
 				duration = '0s';//костылёк анимации
+				//повторная проверка с той же строки
 				i++;//для считывания опустившегося вниз на одну строку материала
 			}
 		}
 	}
-//	colored($(".dot").get(lines[19][i]), color_light, updown);
+
+//функция проверки условий окончания игры
+var zero;
+function zero_line_overflow()
+	{
+		zero = false;
+		for (i=0; i <10; i++)
+		zero = ($($(".dot").get(i)).attr('class') == 'dot wall') ? true : zero;
+		return zero;
+	}
