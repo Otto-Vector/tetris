@@ -1,9 +1,5 @@
 var color_light = 'rgb(255, 255, 255)',
 	 color_dark = 'rgb(0, 0, 255)',
-	 leftright = 'scaleX(-1)',
-	 updown = 'scaleY(-1)',
-	 norm = 'scale(1,1)',
-	 duration = '0s',//задержка анимации
 	 colrow = 20, //количество строк/столбцов в активной зоне
 	 rotate_index = 0;//коэффициент итерации поворота объекта //не изменять!
 	 speed = 1000, //скорость падения фигур
@@ -87,7 +83,7 @@ figure_index = Math.floor((Math.random()*figure.length));//случайный и
 
 	//прорисовка объекта
 	for (var i=0; i < 4; i++)
-		colored($(".dot").get(z_object[i]), color_light, leftright);
+		colored($(".dot").get(z_object[i]), color_light);
 
 	//поднятие фигуры, если она отрисовалась при повороте ниже
 	direct('up',z_object);
@@ -100,22 +96,22 @@ $(document).ready(function() {
 	line_control_array(); //создание массива line
 	$($(".dot").get(18)).html(score);//вывод очков
 
-	$(".dot").bind({
-		mouseenter: function() {colorSwitch(this, leftright)}
-//		mouseleave: function() {normal(this);}
-	});
+// 	$(".dot").bind({ //рисование на поле
+// 		mouseenter: function() {colorSwitch(this)}
+// //		mouseleave: function() {normal(this);}
+// 	});
 	var start;
 	$("#start").click(function()
 		{
-		active_z();
-		auto_down(speed);
+		active_z();//активация первой фигуры
+		auto_down(speed); //активация движения
 		});
 	$("#pause").click(function(){ timer = false;});
 	
 	$("#up").click(function(){line_control()});
 	// $("#left").click(function(){fig_const()});
 
-//считывание клавиатуры
+	//считывание клавиатуры
 	window.addEventListener('keydown', function(e)
 	{
 		if (timer)
@@ -123,7 +119,7 @@ $(document).ready(function() {
 			if (e.key == 'ArrowLeft') direct('left',z_object);//налево
 			if (e.key == 'ArrowRight') direct('right',z_object);//направо
 			if (e.key == 'ArrowUp') rotater(z_object); //кнопка поворота объекта
-			if (e.key == 'ArrowDown') for(i=0;i<6;i++)direct('down',z_object); //кнопка ускорения
+			if (e.key == 'ArrowDown') for(i=0;i<2;i++)direct('down',z_object); //кнопка ускорения
 		}
 		
 	});
@@ -132,24 +128,17 @@ $(document).ready(function() {
 ///////////////////////////////////////////////////
 
 /////////////БЛОК АНИМИРОВАНИЯ ПЕРЕМЕЩЕНИЯ////////////////////
-//функция нормализации
-	function normal(obj)
-	{
-		$(obj).css('transitionDuration',"0s");
-		$(obj).css('transform',norm);
-	}
 //функция смены цвета
-	function colorSwitch(object, direction)
+	function colorSwitch(object)
 	{
 		var color = ($(object).css('backgroundColor') == color_dark) ? color_light: color_dark;
 		$(object).toggleClass('wall');
-		colored(object,color,direction);
+		colored(object,color);
 	}
 //функция окрашивания
-	function colored(object,color,direction)
+	function colored(object,color)
 	{
-		$(object).css('transitionDuration', duration);
-		$(object).css('backgroundColor',color).css('transform',direction);
+		$(object).css('backgroundColor',color);
 	}
 
 /////////////БЛОК ПОВЕДЕНИЯ ОБЪЕКТОВ////////////////////////////////
@@ -176,13 +165,13 @@ $(document).ready(function() {
 			for (var i=0; i < 4; i++)
 			{
 				//зачистка пространства
-				colored($(".dot").get(what_rotate[i]), color_dark, leftright);
+				colored($(".dot").get(what_rotate[i]), color_dark);
 				//смена значений для поворота
 				what_rotate[i] += turn[i];
 			}
 			//пересоздание объекта по новым адресатам
 			for (var i=0; i < 4 ; i++)
-				colored($(".dot").get(what_rotate[i]), color_light, updown);
+				colored($(".dot").get(what_rotate[i]), color_light);
 		}
 		else {rotate_index = (rotate_index !== 0) ? --rotate_index : 3;} //если препятствие, то индекс минусуется
 	}
@@ -193,8 +182,6 @@ $(document).ready(function() {
 		var n =  (to == 'down') ? colrow : //значение смещения вниз
 					(to == 'up') ? -colrow : //значение смещения вверх (для корректировки появляющихся фигур)
 					(to == 'left') ? -1 : 1; //либо направо/налево
-
-		var rotate = (to == 'down') ? updown : leftright;//определение направления анимации поворота кругляшей
 
 		//проверка на препятствия
 		var min_left = 1,	min = 1,	min_bottom = 1, min_up = 1;
@@ -215,14 +202,13 @@ $(document).ready(function() {
 		//стирание объекта
 		for (var i=0; i < 4; i++)
 		{
-			colored($(".dot").get(what[i]), color_dark, rotate);
-			normal($(".dot").get(what[i]));
+			colored($(".dot").get(what[i]), color_dark);
 		}
 		//прорисовка объекта
 		for (var i=0; i < 4; i++)
 		{
 			what[i]+=n;
-			colored($(".dot").get(what[i]), color_light, rotate);
+			colored($(".dot").get(what[i]), color_light);
 		}
 		//передача управления новому объекту при окончательном падении объекта
 		if ((min_bottom == 0 || min == 0) && to == 'down')
@@ -267,10 +253,10 @@ function line_control()
 			}
 			//если все десять значений в линии совпадают, то запускается событие перерисовки
 			if (line_complete == 10)
-			{	duration = '1s';//костылёк анимации
+			{
 				for (var j=0; j < 10; j++) //убираем первую строку
 				{
-					colored($(".dot").get(lines[i][j]), color_dark, updown);//анимация сокращения строки
+					colored($(".dot").get(lines[i][j]), color_dark);//анимация сокращения строки
 					$($(".dot").get(lines[i][j])).toggleClass('wall',false);//убираем значение wall
 				}
 				score++;//прибавляем очко
@@ -289,15 +275,13 @@ function line_control()
 					}
 
 
-				duration = '0s'; //костылёк анимации
-
 				//зачищаем пространство над (ii=i-1) убраной линией
 				for (var ii=i-1; ii > -1; ii--) 
 				{
 					for (var j=0; j < 10; j++)
 					{
 						$($(".dot").get(lines[ii][j])).toggleClass('wall',false);//стираем значения 'wall'
-						colored($(".dot").get(lines[ii][j]), color_dark, updown);//перекрашивание поля в цвет фона
+						colored($(".dot").get(lines[ii][j]), color_dark);//перекрашивание поля в цвет фона
 					}
 				}
 
@@ -309,10 +293,9 @@ function line_control()
 						$($(".dot").get(lines[ii][j])).attr("class", line_to_switch[line_i]);
 						//немедленная окраска значений 'dot wall'
 						if (line_to_switch[line_i] == "dot wall")
-							colored($(".dot").get(lines[ii][j]), color_light, updown);
+							colored($(".dot").get(lines[ii][j]), color_light);
 						line_i++;//переход на следующий индекс буферного массива
 					}
-				duration = '0s';//костылёк анимации
 				//повторная проверка с той же строки
 				i++;//для считывания опустившегося вниз на одну строку материала
 			}
