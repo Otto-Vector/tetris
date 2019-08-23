@@ -71,6 +71,7 @@ function line_control_array()
 		}
 	}
 
+//создание массива данных для зачистки окна со следующей фигурой
 function interface_next_figure()
 	{
 		var index1 = 0;
@@ -86,18 +87,14 @@ function interface_next_figure()
 
 /////активация нового объекта///////
 figure_index = Math.floor((Math.random()*figure.length));//случайный индекс объекта
-var previous_index;
+var previous_figure_index;
+var previous_figure_rotate_index = 0;
 function active_z()
-{
-	previous_index = figure_index; //костыль для rotatera
+{	
+	previous_figure_index = figure_index; //костыль для rotatera по пердаче объекта
+	rotate_index = previous_figure_rotate_index; //костыль для rotatera по передаче положения при повороте
 	for (var i=0; i < 4; i++)//присвоение активному объекту значения буферной переменной
 		z_object[i] = figure[figure_index][i];
-//	console.log("From z Begin = "+figure_index);
-	//поворот изначального состояния объекта
-	// rotate_index = 0;//обнуление поворота
-	// var rand = Math.floor((Math.random()*5));//случайное положение поворота
-	// for (var i=0; i < rand; i++) rotater(z_object);
-
 	//прорисовка объекта
 	for (var i=0; i < 4; i++)
 		colored($(".dot").get(z_object[i]), color_light);
@@ -110,11 +107,21 @@ function active_z()
 		colored($(".dot").get(interface_next_figure_array[i]), color_dark);
 
 	figure_index = Math.floor((Math.random()*figure.length));
-	
-//	console.log("From z END = "+figure_index);
+	fig_const(); //перезаливка промежуточного массива объектов
+
+	//поворот изначального состояния следующего объекта
+	previous_figure_rotate_index = 0;//обнуление поворота
+	var rand = Math.floor((Math.random()*5));//случайное положение поворота
+	for (var i=0; i < rand; i++)
+		{
+			previous_figure_rotate_index = (previous_figure_rotate_index !== 3) ? ++previous_figure_rotate_index : 0;
+			for (var ii=0; ii <4; ii++)
+				figure[figure_index][ii] += figure_rotater[figure_index][previous_figure_rotate_index][ii];
+		}
 	//прорисовка справа следующей фигуры
 	for (var i=0; i < 4; i++)
 		colored($(".dot").get(figure[figure_index][i]+(colrow*7)+10), color_light);
+
 }
 
 ///////////////////ИСПОЛНИТЕЛЬНЫЙ БЛОК///////////////////////////////
@@ -156,7 +163,7 @@ $(document).ready(function() {
 });
 ///////////////////////////////////////////////////
 
-/////////////БЛОК АНИМИРОВАНИЯ ПЕРЕМЕЩЕНИЯ////////////////////
+/////////////БЛОК CМЕНЫ ЦВЕТОВ////////////////////
 //функция смены цвета
 	function colorSwitch(object)
 	{
@@ -170,16 +177,16 @@ $(document).ready(function() {
 		$(object).css('backgroundColor',color);
 	}
 
-/////////////БЛОК ПОВЕДЕНИЯ ОБЪЕКТОВ////////////////////////////////
 
+/////////////БЛОК ПОВЕДЕНИЯ ОБЪЕКТОВ////////////////////////////////
 
 ///////////////--Поворот объекта--//////////////////////////
 	function rotater(what_rotate)
 	{
 		//зацикливание индекса поворота 1-2-3-0 //и смена его значения на ++
 		rotate_index = (rotate_index !== 3) ? ++rotate_index : 0;
-		var turn = figure_rotater[previous_index][rotate_index];//уменьшение размера переменной
-//		console.log("From rotater = "+figure_index);
+		var turn = figure_rotater[previous_figure_index][rotate_index];//уменьшение размера переменной
+
 		//проверка на столкновение с препятствиями
 		var min_left = 1,	min = 1,	min_bottom = 1;
 		for (var i=0; i < 4; i++)
@@ -243,12 +250,10 @@ $(document).ready(function() {
 		if ((min_bottom == 0 || min == 0) && to == 'down')
 		{
 			//сначала проверяем game_over
-			if (zero_line_overflow()) console.log('GAME OVER!!!');
-			//
+			if (zero_line_overflow()) alert("GAME OVER! \n You`re score is "+score+" lines.");//
 			for (var i=0; i < 4; i++)
 			$($(".dot").get(what[i])).toggleClass('wall',true);//объект превращается в wall
 			line_control();//запуск считывания линий
-			fig_const(); //перезаливка промежуточного массива объектов
 			active_z(); //активация нового объекта
 		}
 }
@@ -269,7 +274,6 @@ $(document).ready(function() {
 ///////////-ФУНКЦИИ МАНИПУЛЯЦИИ С ЛИНИЯМИ//////////////////
 
 //проверка на сложенную линию
-
 function line_control()
 	{
 		var line_complete; //определение переменной проверки линии
