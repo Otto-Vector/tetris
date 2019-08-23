@@ -3,7 +3,7 @@ var color_light = 'rgb(255, 255, 255)',
 	 leftright = 'scaleX(-1)',
 	 updown = 'scaleY(-1)',
 	 norm = 'scale(1,1)',
-	 duration = '0.3s',//задержка анимации
+	 duration = '0s',//задержка анимации
 	 colrow = 20, //количество строк/столбцов в активной зоне
 	 rotate_index = 0;//коэффициент итерации поворота объекта //не изменять!
 	 speed = 1000, //скорость падения фигур
@@ -17,7 +17,6 @@ var figure_constant = [
 								[23,24,25,26],
 								[3,4,24,25],
 								[3,4,22,23],
-								[5,5,5,5],
 								[4,24,25,26],
 								[6,24,25,26],
 								[5,24,25,26]
@@ -29,7 +28,6 @@ var 			figure = [
 								[23,24,25,26],
 								[3,4,24,25],
 								[3,4,22,23],
-								[5,5,5,5],
 								[4,24,25,26],
 								[6,24,25,26],
 								[5,24,25,26]
@@ -46,12 +44,10 @@ var figure_rotater = [
 //3
 			[ [0,-19,-2,-21], [0,19,2,21], [0,-19,-2,-21], [0,19,2,21] ], //Z зеркльная
 //4
-			[ [0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0] ], //точка
-//5
 			[ [-1,-1,-20,-18], [1,-18,0,19], [19,19,1,1], [-19,0,19,-2] ], //Г
-//6
+//5
 			[ [2,19,0,-19], [-1,1,20,20], [19,0,-19,-2], [-20,-20,-1,1] ], //Г зеркальная
-//7
+//6
 			[ [0,0,0,-19], [0,1,1,19], [19,0,0,0], [-19,-1,-1,0] ] //четвёрка _~_
 		];
 
@@ -76,9 +72,31 @@ function line_control_array()
 		}
 	}
 
+//здесь присваивается первый объект...
+var figure_index = Math.floor((Math.random()*figure.length));
+var z_object = figure[figure_index]; //для проверки подстановка фигур
+
+//активация нового объекта
+//var figure_index, z_object;//объявляем глобальные переменные для объекта
+function active_z()
+{
+figure_index = Math.floor((Math.random()*figure.length));//случайный индекс объекта
+	for (var i=0; i < 4; i++)//присвоение активному объекту значения буферной переменной
+		z_object[i] = figure[figure_index][i];
+	//поворот изначального состояния объекта
+	rotate_index = 0;//обнуление поворота
+	var rand = Math.floor((Math.random()*5));//случайное положение поворота
+	for (var i=0; i < rand; i++) rotater(z_object);
+
+	//прорисовка объекта
+	for (var i=0; i < 4; i++)
+		colored($(".dot").get(z_object[i]), color_light, leftright);
+}
+
 ///////////////////ИСПОЛНИТЕЛЬНЫЙ БЛОК///////////////////////////////
 $(document).ready(function() {
 
+//	active_z(); //активация первой фигуры
 	line_control_array(); //создание массива line
 	$($(".dot").get(18)).html(score);//вывод очков
 
@@ -89,6 +107,7 @@ $(document).ready(function() {
 	var start;
 	$("#start").click(function()
 		{
+		active_z();
 		auto_down(speed);
 		});
 	$("#pause").click(function(){ timer = false;});
@@ -135,19 +154,29 @@ $(document).ready(function() {
 
 /////////////БЛОК ПОВЕДЕНИЯ ОБЪЕКТОВ////////////////////////////////
 
-//здесь будет функция появления нового объекта
+//здесь присваивается первый объект...
 var figure_index = Math.floor((Math.random()*figure.length));
 var z_object = figure[figure_index]; //для проверки подстановка фигур
 
+
+//активация нового объекта
+//var figure_index, z_object;//объявляем глобальные переменные для объекта
 function active_z()
 {
-figure_index = Math.floor((Math.random()*figure.length));
-	for (var i=0; i < 4; i++)
+figure_index = Math.floor((Math.random()*figure.length));//случайный индекс объекта
+	for (var i=0; i < 4; i++)//присвоение активному объекту значения буферной переменной
 		z_object[i] = figure[figure_index][i];
 	//поворот изначального состояния объекта
 	rotate_index = 0;//обнуление поворота
-	var rand = Math.floor((Math.random()*5));
+	var rand = Math.floor((Math.random()*5));//случайное положение поворота
 	for (var i=0; i < rand; i++) rotater(z_object);
+
+	//прорисовка объекта
+	for (var i=0; i < 4; i++)
+		colored($(".dot").get(z_object[i]), color_light, leftright);
+
+	//поднятие фигуры, если она отрисовалась при повороте ниже
+	//direct('up');
 }
 
 ///////////////--Поворот объекта--//////////////////////////
@@ -191,12 +220,13 @@ figure_index = Math.floor((Math.random()*figure.length));
 		var rotate = (to == 'down') ? updown : leftright;//определение направления анимации поворота кругляшей
 
 		//проверка на препятствия
-		var min_left = 1,	min = 1,	min_bottom = 1;
+		var min_left = 1,	min = 1,	min_bottom = 1, min_up = 1;
 		for (var i=0; i < 4; i++)
 		{
 		min_left = (what[i] % 20 == 0 ) ? 0 : min_left; //CТЕНА СЛЕВА
 		min = ($($(".dot").get(what[i]+n)).attr("class") == 'dot wall') ? 0 : min; //твёрдый объект .wall рядом
 		min_bottom = (what[i]+n > 399 ) ? 0 : min_bottom;//ПОЛ СНИЗУ
+//		min_up = (what[i]+n > 399 ) ? 0 : min_up;
 		}
 
 		//корректировка перемещения от препятствий
@@ -256,7 +286,7 @@ function line_control()
 				line_complete = ($($(".dot").get(lines[i][j])).attr("class") == 'dot wall') ? ++line_complete : line_complete;
 			}
 			if (line_complete == 10)
-			{	duration = '1s';
+			{	duration = '1s';//костылёк анимации
 				for (var j=0; j < 10; j++) //убираем первую строку
 				{
 					colored($(".dot").get(lines[i][j]), color_dark, updown);//анимация сокращения строки
@@ -279,7 +309,7 @@ function line_control()
 					}
 
 				//зачищаем
-				duration = '0s';
+				duration = '0s'; //костылёк анимации
 				var fist_line_animation=true;
 				for (var ii=i-1; ii > -1; ii--)
 				{
@@ -300,7 +330,7 @@ function line_control()
 							colored($(".dot").get(lines[ii][j]), color_light, updown);
 						line_i++;
 					}
-				duration = '0.3s';
+				duration = '0s';//костылёк анимации
 				i++;//для считывания опустившегося вниз на одну строку материала
 			}
 		}
