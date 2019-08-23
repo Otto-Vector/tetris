@@ -1,0 +1,60 @@
+$fst_color: blue
+$snd_color: white
+
+$dots_row: 20 //количество точек в строке/столбце квадрата
+$bw: .2% //для расстояний между точками
+$wh: 100/$dots_row - $bw //подсчёт процентного составляющего значения актива
+
+
+body
+	background-color: #1a528a
+
+//основной контейнер для позиционирования квадрата с активной областью
+#container
+	display: flex
+	height: 500px
+	justify-content: center
+	padding-top: 100px
+	width: 100%
+
+	.box //квадрат содержащий активные области
+		background-color: black
+		border: 1px solid white
+		display: flex
+		flex-wrap: wrap
+		justify-content: space-around
+		transition-duration: .6s
+		width: 500px
+
+		.dot //активные пиксели
+			border-radius: 50%
+			background-color: blue
+			color: whitesmoke
+			font-size: 12px
+			height: $wh
+			transition-duration: .4s
+			text-align: center
+			width: $wh
+		.dot.wall //пиксели интерфейса
+			background-color: #fff
+
+.after
+	height: 100px
+	display: flex
+	justify-content: center
+	align-items: center
+
+	#start
+		border-radius: 5px
+		background-color: $snd_color
+		color: $fst_color
+		cursor: pointer
+		font-family: arial
+		font-weight: bold
+		padding: 10px
+
+	#start:hover
+		background-color: $fst_color
+		color: $snd_color
+
+

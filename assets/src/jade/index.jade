@@ -1,0 +1,22 @@
+doctype html
+
+head
+	meta(charset='utf-8')
+	meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+	link(rel='stylesheet' href='css/main.min.css')
+	title Tetris by Otto-Vector
+body
+
+	#container
+		.box
+			- for (var i=0; i<400; i++) {
+				if ((i%10 == 0) && (i%20 != 0))
+					.dot.wall #{i}
+				else
+					.dot
+			- }
+	.after
+		#start START
+
+
+	script(src='js/main.min.js')
