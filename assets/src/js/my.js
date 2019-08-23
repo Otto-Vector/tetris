@@ -9,25 +9,27 @@ var color_light = 'rgb(255, 255, 255)',
 	 speed = 1000, //скорость падения фигур
 	 timer = true, //глобально для прекращения цикла
 	 lines = [], //массив для контроля строк
-	 score = 0;//переменная количества собранных линий
+	 score = 0,//переменная количества собранных линий
+	 figure_index = 0; //активация переменной индекса рандомного объекта
+	 z_object = [0,0,0,0]; //активация массива активной фигуры
 
 //базовые данные
 var figure_constant = [
-								[4,5,24,25],
-								[23,24,25,26],
-								[3,4,24,25],
-								[3,4,22,23],
-								[4,24,25,26],
-								[6,24,25,26],
-								[5,24,25,26]
+								[4,5,24,25], //квадрат
+								[23,24,25,26], //линия
+								[4,5,25,26], //Z
+								[4,5,23,24], //Z - зеркальная
+								[4,24,25,26], //Г
+								[6,24,25,26], //Г зеркальная
+								[5,24,25,26] //четвёрка _~_
 							];
 
 //операбельные данные
 var 			figure = [
 								[4,5,24,25],
 								[23,24,25,26],
-								[3,4,24,25],
-								[3,4,22,23],
+								[4,5,25,26],
+								[4,5,23,24],
 								[4,24,25,26],
 								[6,24,25,26],
 								[5,24,25,26]
@@ -72,12 +74,7 @@ function line_control_array()
 		}
 	}
 
-//здесь присваивается первый объект...
-var figure_index = Math.floor((Math.random()*figure.length));
-var z_object = figure[figure_index]; //для проверки подстановка фигур
-
-//активация нового объекта
-//var figure_index, z_object;//объявляем глобальные переменные для объекта
+/////активация нового объекта///////
 function active_z()
 {
 figure_index = Math.floor((Math.random()*figure.length));//случайный индекс объекта
@@ -91,6 +88,9 @@ figure_index = Math.floor((Math.random()*figure.length));//случайный и
 	//прорисовка объекта
 	for (var i=0; i < 4; i++)
 		colored($(".dot").get(z_object[i]), color_light, leftright);
+
+	//поднятие фигуры, если она отрисовалась при повороте ниже
+	direct('up',z_object);
 }
 
 ///////////////////ИСПОЛНИТЕЛЬНЫЙ БЛОК///////////////////////////////
@@ -154,30 +154,6 @@ $(document).ready(function() {
 
 /////////////БЛОК ПОВЕДЕНИЯ ОБЪЕКТОВ////////////////////////////////
 
-//здесь присваивается первый объект...
-var figure_index = Math.floor((Math.random()*figure.length));
-var z_object = figure[figure_index]; //для проверки подстановка фигур
-
-
-//активация нового объекта
-//var figure_index, z_object;//объявляем глобальные переменные для объекта
-function active_z()
-{
-figure_index = Math.floor((Math.random()*figure.length));//случайный индекс объекта
-	for (var i=0; i < 4; i++)//присвоение активному объекту значения буферной переменной
-		z_object[i] = figure[figure_index][i];
-	//поворот изначального состояния объекта
-	rotate_index = 0;//обнуление поворота
-	var rand = Math.floor((Math.random()*5));//случайное положение поворота
-	for (var i=0; i < rand; i++) rotater(z_object);
-
-	//прорисовка объекта
-	for (var i=0; i < 4; i++)
-		colored($(".dot").get(z_object[i]), color_light, leftright);
-
-	//поднятие фигуры, если она отрисовалась при повороте ниже
-	//direct('up');
-}
 
 ///////////////--Поворот объекта--//////////////////////////
 	function rotater(what_rotate)
@@ -204,8 +180,8 @@ figure_index = Math.floor((Math.random()*figure.length));//случайный и
 				//смена значений для поворота
 				what_rotate[i] += turn[i];
 			}
-
-			for (var i=0; i < 4 ; i++)	//пересоздание объекта по новым адресатам
+			//пересоздание объекта по новым адресатам
+			for (var i=0; i < 4 ; i++)
 				colored($(".dot").get(what_rotate[i]), color_light, updown);
 		}
 		else {rotate_index = (rotate_index !== 0) ? --rotate_index : 3;} //если препятствие, то индекс минусуется
@@ -215,6 +191,7 @@ figure_index = Math.floor((Math.random()*figure.length));//случайный и
 	function direct(to, what)
 	{
 		var n =  (to == 'down') ? colrow : //значение смещения вниз
+					(to == 'up') ? -colrow : //значение смещения вверх (для корректировки появляющихся фигур)
 					(to == 'left') ? -1 : 1; //либо направо/налево
 
 		var rotate = (to == 'down') ? updown : leftright;//определение направления анимации поворота кругляшей
@@ -226,13 +203,14 @@ figure_index = Math.floor((Math.random()*figure.length));//случайный и
 		min_left = (what[i] % 20 == 0 ) ? 0 : min_left; //CТЕНА СЛЕВА
 		min = ($($(".dot").get(what[i]+n)).attr("class") == 'dot wall') ? 0 : min; //твёрдый объект .wall рядом
 		min_bottom = (what[i]+n > 399 ) ? 0 : min_bottom;//ПОЛ СНИЗУ
-//		min_up = (what[i]+n > 399 ) ? 0 : min_up;
+		min_up = (what[i]+n < 1 ) ? 0 : min_up;//прoверка для корректировки проявленой фигуры
 		}
 
 		//корректировка перемещения от препятствий
 		if ((min_left == 0 || min == 0) && to == 'left') ++n;
 		if (min == 0 && to == 'right') --n;
 		if ((min_bottom == 0 || min == 0) && to == 'down') n-=colrow;
+		if (min_up == 0 && to == 'up') n+=colrow;
 		
 		//стирание объекта
 		for (var i=0; i < 4; i++)
@@ -246,15 +224,14 @@ figure_index = Math.floor((Math.random()*figure.length));//случайный и
 			what[i]+=n;
 			colored($(".dot").get(what[i]), color_light, rotate);
 		}
-		//передача управления новому объекту
+		//передача управления новому объекту при окончательном падении объекта
 		if ((min_bottom == 0 || min == 0) && to == 'down')
 		{
 			for (var i=0; i < 4; i++)
 			$($(".dot").get(what[i])).toggleClass('wall',true);//объект превращается в wall
 			line_control();//запуск считывания линий
-			fig_const(); //перезаливка промежуточного массива
-			active_z(); //перезапись нового объекта
-
+			fig_const(); //перезаливка промежуточного массива объектов
+			active_z(); //активация нового объекта
 		}
 }
 
