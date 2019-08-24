@@ -6,6 +6,16 @@ $bw: .2% //для расстояний между точками
 $wh: 100/$dots_row - $bw //подсчёт процентного составляющего значения актива
 
 
+//////////миксин для кнопки/////////////
+// =transform($property)
+//   -webkit-transform: $property
+//   -ms-transform: $property
+//   transform: $property
+// .box
+//   +transform(rotate(30deg))
+
+/////////////////////////////////////
+
 body
 	background-color: #1a528a
 
@@ -40,13 +50,15 @@ body
 		.dot.wall //пиксели интерфейса
 			background-color: $snd_color
 
+
+
 .after
 	height: 100px
 	display: flex
 	justify-content: center
 	align-items: center
 
-	#start
+	#start, #pause
 		border-radius: 5px
 		background-color: $snd_color
 		color: $fst_color
@@ -54,8 +66,9 @@ body
 		font-family: arial
 		font-weight: bold
 		padding: 10px
+		margin: 0 10px
 
-	#start:hover
+	#start:hover, #pause:hover
 		background-color: $fst_color
 		color: $snd_color
 

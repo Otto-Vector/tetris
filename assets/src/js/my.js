@@ -85,6 +85,88 @@ function interface_next_figure()
 		}
 	}
 
+var onoff = true;
+var start = true;
+///////////////////ИСПОЛНИТЕЛЬНЫЙ БЛОК///////////////////////////////
+$(document).ready(function() {
+
+//	active_z(); //активация первой фигуры
+	line_control_array(); //создание массива line
+	interface_next_figure(); //создание массива для зачистки поля вывода следующей фигуры
+	$($(".dot").get(38)).html(score);//вывод очков
+
+	$(".dot").bind({ //рисование на поле
+//		mouseenter: function() {colorSwitch(this)}
+//		mouseleave: function() {normal(this);}
+	});
+	
+	$("#start").click(function()
+		{
+			if (start)
+			{
+			active_z();//активация первой фигуры
+			auto_down(speed); //активация движения
+			}
+		});
+	//пауза работает
+	$("#pause").click(function()
+	{
+		if ((onoff) && !(start))
+		{
+			onoff = false;
+			clearInterval(timer);
+			$('.dot').css('opacity','0.2');//"затемнение" на паузе
+		}
+		else if (!(onoff) && !(start))
+		{
+			onoff = true;
+			auto_down(speed);
+			$('.dot').css('opacity','1');//возврат к нормальному виду
+		}
+	});
+	
+	$("#up").click(function(){line_control()});
+	// $("#left").click(function(){fig_const()});
+
+	//считывание клавиатуры
+	window.addEventListener('keydown', function(e)
+	{
+		if (onoff)
+		{
+			if (e.key == 'ArrowLeft') direct('left',z_object);//налево
+			if (e.key == 'ArrowRight') direct('right',z_object);//направо
+			if (e.key == 'ArrowUp') rotater(z_object); //кнопка поворота объекта
+			if (e.key == 'ArrowDown') for(i=0;i<2;i++)direct('down',z_object); //кнопка ускорения
+		}
+		
+	});
+
+});
+///////////////////////////////////////////////////
+
+//функция автозапуска падения блоков
+function auto_down(speed_in_function) {
+	timer = setInterval("direct('down', z_object)", speed_in_function);
+	start = false;//переменная для того чтобы можно было нажать на start один раз за игру
+}
+
+/////////////БЛОК CМЕНЫ ЦВЕТОВ////////////////////
+//функция смены цвета
+	function colorSwitch(object)
+	{
+		var color = ($(object).css('backgroundColor') == color_dark) ? color_light: color_dark;
+		$(object).toggleClass('wall');
+		colored(object,color);
+	}
+//функция окрашивания
+	function colored(object,color)
+	{
+		$(object).css('backgroundColor',color);
+	}
+
+
+/////////////БЛОК ПОВЕДЕНИЯ ОБЪЕКТОВ////////////////////////////////
+
 /////активация нового объекта///////
 figure_index = Math.floor((Math.random()*figure.length));//случайный индекс объекта
 var previous_figure_index;
@@ -121,64 +203,7 @@ function active_z()
 	//прорисовка справа следующей фигуры
 	for (var i=0; i < 4; i++)
 		colored($(".dot").get(figure[figure_index][i]+(colrow*7)+10), color_light);
-
 }
-
-///////////////////ИСПОЛНИТЕЛЬНЫЙ БЛОК///////////////////////////////
-$(document).ready(function() {
-
-//	active_z(); //активация первой фигуры
-	line_control_array(); //создание массива line
-	interface_next_figure(); //создание массива для зачистки поля вывода следующей фигуры
-	$($(".dot").get(38)).html(score);//вывод очков
-
-// 	$(".dot").bind({ //рисование на поле
-// 		mouseenter: function() {colorSwitch(this)}
-// //		mouseleave: function() {normal(this);}
-// 	});
-	var start;
-	$("#start").click(function()
-		{
-		active_z();//активация первой фигуры
-		auto_down(speed); //активация движения
-		});
-	$("#pause").click(function(){ timer = false;});
-	
-	$("#up").click(function(){line_control()});
-	// $("#left").click(function(){fig_const()});
-
-	//считывание клавиатуры
-	window.addEventListener('keydown', function(e)
-	{
-		if (timer)
-		{
-			if (e.key == 'ArrowLeft') direct('left',z_object);//налево
-			if (e.key == 'ArrowRight') direct('right',z_object);//направо
-			if (e.key == 'ArrowUp') rotater(z_object); //кнопка поворота объекта
-			if (e.key == 'ArrowDown') for(i=0;i<2;i++)direct('down',z_object); //кнопка ускорения
-		}
-		
-	});
-
-});
-///////////////////////////////////////////////////
-
-/////////////БЛОК CМЕНЫ ЦВЕТОВ////////////////////
-//функция смены цвета
-	function colorSwitch(object)
-	{
-		var color = ($(object).css('backgroundColor') == color_dark) ? color_light: color_dark;
-		$(object).toggleClass('wall');
-		colored(object,color);
-	}
-//функция окрашивания
-	function colored(object,color)
-	{
-		$(object).css('backgroundColor',color);
-	}
-
-
-/////////////БЛОК ПОВЕДЕНИЯ ОБЪЕКТОВ////////////////////////////////
 
 ///////////////--Поворот объекта--//////////////////////////
 	function rotater(what_rotate)
@@ -257,19 +282,6 @@ $(document).ready(function() {
 			active_z(); //активация нового объекта
 		}
 }
-
-//автоматическое перемещение вниз
-	function auto_down(speed,onof)
-	{
-		var timerId = setTimeout(function fall_down() {
-		if (timer)
-		{
-		direct('down', z_object);
-		timer = setTimeout(fall_down, speed);
-		}
-		}, speed);
-	}
-
 
 ///////////-ФУНКЦИИ МАНИПУЛЯЦИИ С ЛИНИЯМИ//////////////////
 
