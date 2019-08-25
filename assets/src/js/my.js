@@ -8,9 +8,10 @@ var color_light = 'rgb(255, 255, 255)',
 	 score = 0,//переменная количества собранных линий
 	 figure_index = 0, //активация переменной индекса рандомного объекта
 	 z_object = [0,0,0,0], //активация массива активной фигуры
-	 interface_next_figure_array = [];
+	 onoff = true, //переменная состояния для паузы
+	 start = true; //переменная состояния запуска движения
 
-//базовые данные
+//базовые данные фигур
 var figure_constant = [
 								[4,5,24,25], //квадрат
 								[23,24,25,26], //линия
@@ -21,7 +22,7 @@ var figure_constant = [
 								[5,24,25,26] //четвёрка _~_
 							];
 
-//операбельные данные
+//операбельные данные фигур
 var 			figure = [
 								[4,5,24,25],
 								[23,24,25,26],
@@ -50,7 +51,7 @@ var figure_rotater = [
 			[ [0,0,0,-19], [0,1,1,19], [19,0,0,0], [-19,-1,-1,0] ] //четвёрка _~_
 		];
 
-//обнуление данных о начальном положении фигур
+//обновление данных о начальном положении фигур
 function fig_const()
 {
 	for (var i=0; i < figure_constant.length; i++)
@@ -59,7 +60,8 @@ function fig_const()
 }
 
 //создание массива данных контрольной области для проверки линий
-function line_control_array()
+//clear отвечает за функцию очистки при новом старте программы
+function line_control_array(clear)
 	{
 		for (var i = 0; i < colrow; i++)
 		{
@@ -67,6 +69,12 @@ function line_control_array()
 			for (var j = 0; j < 10; j++)
 			{
 				lines[i][j]= j+i*(colrow);
+
+				if (clear) //функция зачистки
+				{
+					$($(".dot").get(lines[i][j])).toggleClass('wall',false);//стираем значения 'wall'
+					colored($(".dot").get(lines[i][j]), color_dark);//перекрашивание поля в цвет фона
+				}
 			}
 		}
 	}
@@ -74,42 +82,26 @@ function line_control_array()
 //создание массива данных для зачистки окна со следующей фигурой
 function interface_next_figure()
 	{
-		var index1 = 0;
 		for (var i = 7; i < 11; i++)
-		{
 			for (var j = 12; j < 19; j++)
-			{
-				interface_next_figure_array[index1]= j+i*colrow;
-				index1++;
-			}
-		}
+				colored($(".dot").get(j+i*colrow), color_dark);//перекрашивание поля в цвет фона
 	}
 
-var onoff = true;
-var start = true;
-///////////////////ИСПОЛНИТЕЛЬНЫЙ БЛОК///////////////////////////////
-$(document).ready(function() {
+//функция для зачистки пространства перед новой игрой
+function new_game()
+	{
+		onoff = true;//снимаем с паузы
+		$('.dot').css('opacity','1');//возврат к нормальному виду если была пауза
+		line_control_array(true);//зачищаем основное пространство
+		score = 0;//зачистка количества очков
+		$($(".dot").get(38)).html(score);//вывод очков
+		active_z();//активация первой фигуры
+		clearInterval(timer);//сброс таймера движения
+		auto_down(speed); //активация движения
+	}
 
-//	active_z(); //активация первой фигуры
-	line_control_array(); //создание массива line
-	interface_next_figure(); //создание массива для зачистки поля вывода следующей фигуры
-	$($(".dot").get(38)).html(score);//вывод очков
-
-	$(".dot").bind({ //рисование на поле
-//		mouseenter: function() {colorSwitch(this)}
-//		mouseleave: function() {normal(this);}
-	});
-	
-	$("#start").click(function()
-		{
-			if (start)
-			{
-			active_z();//активация первой фигуры
-			auto_down(speed); //активация движения
-			}
-		});
-	//пауза работает
-	$("#pause").click(function()
+//функция паузы
+function pause(overflow)
 	{
 		if ((onoff) && !(start))
 		{
@@ -117,13 +109,29 @@ $(document).ready(function() {
 			clearInterval(timer);
 			$('.dot').css('opacity','0.2');//"затемнение" на паузе
 		}
-		else if (!(onoff) && !(start))
+		else if (!(onoff) && !(start) && !(overflow)) //если конец игры, то с паузы не снимается
 		{
 			onoff = true;
+			clearInterval(timer);
 			auto_down(speed);
 			$('.dot').css('opacity','1');//возврат к нормальному виду
 		}
+	}
+
+///////////////////ИСПОЛНИТЕЛЬНЫЙ БЛОК///////////////////////////////
+$(document).ready(function() {
+
+	line_control_array(); //создание массива line
+	interface_next_figure(); //создание массива для зачистки поля вывода следующей фигуры
+
+	$(".dot").bind({ //рисование на поле
+//		mouseenter: function() {colorSwitch(this)}
+//		mouseleave: function() {normal(this);}
 	});
+	
+	$("#start").click(function() { new_game(); });
+	//пауза работает
+	$("#pause").click(function(){ pause(zero_line_overflow()); }); //overflow для того чтобы пауза не отжималась по окончании игры
 	
 	$("#up").click(function(){line_control()});
 	// $("#left").click(function(){fig_const()});
@@ -185,9 +193,9 @@ function active_z()
 	direct('up',z_object);
 
 	//зачистка пространства в интерфейсе следующей фигуры
-	for (var i=0; i < interface_next_figure_array.length; i++)
-		colored($(".dot").get(interface_next_figure_array[i]), color_dark);
+	interface_next_figure();
 
+	//случайный индекс для следующей фигуры
 	figure_index = Math.floor((Math.random()*figure.length));
 	fig_const(); //перезаливка промежуточного массива объектов
 
@@ -275,7 +283,12 @@ function active_z()
 		if ((min_bottom == 0 || min == 0) && to == 'down')
 		{
 			//сначала проверяем game_over
-			if (zero_line_overflow()) alert("GAME OVER! \n You`re score is "+score+" lines.");//
+			if (zero_line_overflow())
+			{
+				pause(zero_line_overflow());//постановка на паузу
+				alert("GAME OVER! \n You`re score is "+score+" lines.");
+				start=true; //включаем возможность пользоваться new game`
+			}
 			for (var i=0; i < 4; i++)
 			$($(".dot").get(what[i])).toggleClass('wall',true);//объект превращается в wall
 			line_control();//запуск считывания линий

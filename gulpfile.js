@@ -143,7 +143,7 @@ gulp.task('js:build', function () {
 //ПОТОМУ КАК В ДАННОМ ПРОЕКТЕ ПОКА НЕ ИСПОЛЬЗУЮТСЯ
 
 // перенос шрифтов
-// gulp.task('fonts:build', function () {
+//  gulp.task('fonts:build', function () {
 //     return gulp.src(path.src.fonts)
 //         .pipe(gulp.dest(path.build.fonts));
 // });
@@ -191,7 +191,7 @@ gulp.task('build',
             'html:build',
             'php:build',
             'css:build',
-            'js:build'
+            'js:build',
 //            'fonts:build',
 //            'image:build',
 //            'json:build',

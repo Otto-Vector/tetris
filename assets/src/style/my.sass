@@ -6,18 +6,12 @@ $bw: .2% //для расстояний между точками
 $wh: 100/$dots_row - $bw //подсчёт процентного составляющего значения актива
 
 
-//////////миксин для кнопки/////////////
-// =transform($property)
-//   -webkit-transform: $property
-//   -ms-transform: $property
-//   transform: $property
-// .box
-//   +transform(rotate(30deg))
-
-/////////////////////////////////////
+//////////////////////////////////////////////
 
 body
 	background-color: #1a528a
+	font-family: arial
+	font-weight: bold
 
 //основной контейнер для позиционирования квадрата с активной областью
 #container
@@ -40,17 +34,14 @@ body
 			border-radius: 8px
 			background-color: blue
 			color: whitesmoke
-			font-size: 12px
+			font-size: 18px
 			line-height: 200%
-			font-weight: bold
-			height: $wh
 			text-align: center
+			height: $wh
 			width: $wh
 
 		.dot.wall //пиксели интерфейса
 			background-color: $snd_color
-
-
 
 .after
 	height: 100px
@@ -63,7 +54,6 @@ body
 		background-color: $snd_color
 		color: $fst_color
 		cursor: pointer
-		font-family: arial
 		font-weight: bold
 		padding: 10px
 		margin: 0 10px
@@ -71,5 +61,3 @@ body
 	#start:hover, #pause:hover
 		background-color: $fst_color
 		color: $snd_color
-
-
