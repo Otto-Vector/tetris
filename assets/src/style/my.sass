@@ -25,7 +25,6 @@ header
 //основной контейнер для позиционирования квадрата с активной областью
 #container
 	display: flex
-	height: 500px
 	justify-content: center
 	width: 100%
 
@@ -37,6 +36,7 @@ header
 		justify-content: space-around
 		transition-duration: .6s
 		width: 500px
+		height: 500px
 
 		.dot //активные пиксели
 			border-radius: 8px
@@ -50,20 +50,20 @@ header
 		.dot.wall //пиксели интерфейса
 			background-color: $light_color
 
-.after
+.after, .bottom
 	height: 100px
 	display: flex
-	justify-content: center
+	justify-content: space-around
 	align-items: center
 
-	#start, #pause
-		border-radius: 5px
-		background-color: $dark_color
-		color: $light_color
-		cursor: pointer
-		font-weight: bold
-		padding: 10px
-		margin: 0 10px
+#start, #pause, #left, #right, #flip, #down
+	border-radius: 5px
+	background-color: $dark_color
+	color: $light_color
+	cursor: pointer
+	font-weight: bold
+	padding: 10px
+	margin: 1px 10px
 
 	#start:hover, #pause:hover
 		background-color: $light_color
@@ -71,3 +71,21 @@ header
 
 footer
 	font-family: "Times New Roman"
+
+@media (min-width: 800px)
+	#left, #right, #flip, #down
+		display: none
+
+@media (max-width: 540px)
+	#container .box
+		height: 400px
+		width: 400px
+	#container .box .dot
+			font-size: 14px
+
+@media (max-width: 440px)
+	#container .box
+		height: 320px
+		width: 320px
+	#container .box .dot
+			font-size: 12px

@@ -3,6 +3,8 @@ doctype html
 head
 	meta(charset='utf-8')
 	meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+	meta(name="description" content="tetris classic классический тетрис")
+	meta(name="keywords" content="tetris classic классический тетрис js jquery")
 	link(rel='stylesheet' href='css/main.min.css')
 	title Tetris by Otto-Vector
 body
@@ -18,8 +20,17 @@ body
 			- }
 
 	.after
-		#start NEW GAME
-		#pause PAUSE
+		.left
+			#left Left
+		.center
+			#start NEW GAME
+			#pause PAUSE
+		.right
+			#right Right
+	.bottom
+		#flip Flip
+		#down Down
+
 
 	footer
 		h3 HOW TO PLAY

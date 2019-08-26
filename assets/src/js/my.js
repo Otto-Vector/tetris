@@ -102,6 +102,14 @@ $(document).ready(function() {
 	//пауза
 	$("#pause").click(function(){ pause(zero_line_overflow()); }); //overflow для того чтобы пауза не отжималась по окончании игры
 
+	if (onoff) //блокировка кнопок при паузе
+	{
+		$("#left").click(function() { direct('left',z_object); });
+		$("#right").click(function() { direct('right',z_object); });
+		$("#flip").click(function() { rotater(z_object); });
+		$("#down").click(function() { for (i=0;i<3;i++) direct('down',z_object); });
+	}
+	
 	//считывание клавиатуры
 	window.addEventListener('keydown', function(e)
 	{
