@@ -6,7 +6,8 @@ head
 	link(rel='stylesheet' href='css/main.min.css')
 	title Tetris by Otto-Vector
 body
-
+	header
+		h1 TETRIS CLASSIC
 	#container
 		.box
 			- for (var i=0; i<400; i++) {
@@ -20,4 +21,15 @@ body
 		#start NEW GAME
 		#pause PAUSE
 
+	footer
+		h3 HOW TO PLAY
+		p Use 
+			u "Left/Right Arrow" 
+			| keys to move it horizontal
+		p Use 
+			u "Up" 
+			| key to flip it
+		p Use 
+			u "Down" 
+			| key to acceleration down
 	script(src='js/main.min.js')

@@ -1,5 +1,5 @@
-var color_light = 'rgb(255, 255, 255)',
-	 color_dark = 'rgb(0, 0, 255)',
+var color_light = 'rgb(200, 120, 0)',
+	 color_dark = 'rgb(10, 50, 130)',
 	 colrow = 20, //количество строк/столбцов в активной зоне
 	 rotate_index = 0;//коэффициент итерации поворота объекта //не изменять!
 	 speed = 1000, //скорость падения фигур
@@ -8,8 +8,7 @@ var color_light = 'rgb(255, 255, 255)',
 	 score = 0,//переменная количества собранных линий
 	 figure_index = 0, //активация переменной индекса рандомного объекта
 	 z_object = [0,0,0,0], //активация массива активной фигуры
-	 onoff = true, //переменная состояния для паузы
-	 start = true; //переменная состояния запуска движения
+	 onoff = true; //переменная состояния для паузы
 
 //базовые данные фигур
 var figure_constant = [
@@ -87,10 +86,44 @@ function interface_next_figure()
 				colored($(".dot").get(j+i*colrow), color_dark);//перекрашивание поля в цвет фона
 	}
 
+
+///////////////////ИСПОЛНИТЕЛЬНЫЙ БЛОК///////////////////////////////
+$(document).ready(function() {
+
+	line_control_array(); //создание массива line
+	interface_next_figure(); //создание массива для зачистки поля вывода следующей фигуры
+
+	// $(".dot").bind({ //рисование на поле
+	// 	mouseenter: function() {colorSwitch(this)}
+	// });
+
+	//запуск игры
+	$("#start").click(function() { new_game(); });
+	//пауза
+	$("#pause").click(function(){ pause(zero_line_overflow()); }); //overflow для того чтобы пауза не отжималась по окончании игры
+
+	//считывание клавиатуры
+	window.addEventListener('keydown', function(e)
+	{
+		if (onoff) //блокировка кнопок при паузе
+		{
+			if (e.key == 'ArrowLeft') direct('left',z_object);//налево
+			if (e.key == 'ArrowRight') direct('right',z_object);//направо
+			if (e.key == 'ArrowUp') rotater(z_object); //кнопка поворота объекта
+			if (e.key == 'ArrowDown') for (i=0;i<2;i++) direct('down',z_object); //кнопка ускорения
+			if (e.key == 'Escape') pause(zero_line_overflow()); //пауза
+		}
+	});
+
+});
+///////////////////////////////////////////////////
+
+//////////////ФУНКЦИИ ЗАПУСКА/ПАУЗЫ ИГРЫ////////////////////////////
 //функция для зачистки пространства перед новой игрой
 function new_game()
 	{
 		onoff = true;//снимаем с паузы
+		$('body').css('backgroundColor','black');//затемнение остального пространства
 		$('.dot').css('opacity','1');//возврат к нормальному виду если была пауза
 		line_control_array(true);//зачищаем основное пространство
 		score = 0;//зачистка количества очков
@@ -103,59 +136,26 @@ function new_game()
 //функция паузы
 function pause(overflow)
 	{
-		if ((onoff) && !(start))
+		if (onoff)
 		{
 			onoff = false;
 			clearInterval(timer);
 			$('.dot').css('opacity','0.2');//"затемнение" на паузе
+			$('body').css('backgroundColor','rgb(25, 82, 138)');// восстановление цвета заднего фона
 		}
-		else if (!(onoff) && !(start) && !(overflow)) //если конец игры, то с паузы не снимается
+		else if (!(onoff) && !(overflow)) //если конец игры, то с паузы не снимается
 		{
 			onoff = true;
 			clearInterval(timer);
 			auto_down(speed);
 			$('.dot').css('opacity','1');//возврат к нормальному виду
+			$('body').css('backgroundColor','black');// затемнение цвета заднего фона
 		}
 	}
-
-///////////////////ИСПОЛНИТЕЛЬНЫЙ БЛОК///////////////////////////////
-$(document).ready(function() {
-
-	line_control_array(); //создание массива line
-	interface_next_figure(); //создание массива для зачистки поля вывода следующей фигуры
-
-	$(".dot").bind({ //рисование на поле
-//		mouseenter: function() {colorSwitch(this)}
-//		mouseleave: function() {normal(this);}
-	});
-	
-	$("#start").click(function() { new_game(); });
-	//пауза работает
-	$("#pause").click(function(){ pause(zero_line_overflow()); }); //overflow для того чтобы пауза не отжималась по окончании игры
-	
-	$("#up").click(function(){line_control()});
-	// $("#left").click(function(){fig_const()});
-
-	//считывание клавиатуры
-	window.addEventListener('keydown', function(e)
-	{
-		if (onoff)
-		{
-			if (e.key == 'ArrowLeft') direct('left',z_object);//налево
-			if (e.key == 'ArrowRight') direct('right',z_object);//направо
-			if (e.key == 'ArrowUp') rotater(z_object); //кнопка поворота объекта
-			if (e.key == 'ArrowDown') for(i=0;i<2;i++)direct('down',z_object); //кнопка ускорения
-		}
-		
-	});
-
-});
-///////////////////////////////////////////////////
 
 //функция автозапуска падения блоков
 function auto_down(speed_in_function) {
 	timer = setInterval("direct('down', z_object)", speed_in_function);
-	start = false;//переменная для того чтобы можно было нажать на start один раз за игру
 }
 
 /////////////БЛОК CМЕНЫ ЦВЕТОВ////////////////////
@@ -250,22 +250,22 @@ function active_z()
 	{
 		var n =  (to == 'down') ? colrow : //значение смещения вниз
 					(to == 'up') ? -colrow : //значение смещения вверх (для корректировки появляющихся фигур)
-					(to == 'left') ? -1 : 1; //либо направо/налево
+					(to == 'left') ? -1 : 1; //либо налево/направо
 
 		//проверка на препятствия
-		var min_left = 1,	min = 1,	min_bottom = 1, min_up = 1;
+		var min_left = 1,	min_wall = 1,	min_bottom = 1, min_up = 1;
 		for (var i=0; i < 4; i++)
 		{
 		min_left = (what[i] % 20 == 0 ) ? 0 : min_left; //CТЕНА СЛЕВА
-		min = ($($(".dot").get(what[i]+n)).attr("class") == 'dot wall') ? 0 : min; //твёрдый объект .wall рядом
+		min_wall = ($($(".dot").get(what[i]+n)).attr("class") == 'dot wall') ? 0 : min_wall; //твёрдый объект .wall рядом
 		min_bottom = (what[i]+n > 399 ) ? 0 : min_bottom;//ПОЛ СНИЗУ
-		min_up = (what[i]+n < 1 ) ? 0 : min_up;//прoверка для корректировки проявленой фигуры
+		min_up = (what[i]+n < 1 ) ? 0 : min_up;//прoверка для корректировки положения проявленой фигуры
 		}
 
 		//корректировка перемещения от препятствий
-		if ((min_left == 0 || min == 0) && to == 'left') ++n;
-		if (min == 0 && to == 'right') --n;
-		if ((min_bottom == 0 || min == 0) && to == 'down') n-=colrow;
+		if ((min_left == 0 || min_wall == 0) && to == 'left') ++n;
+		if (min_wall == 0 && to == 'right') --n;
+		if ((min_bottom == 0 || min_wall == 0) && to == 'down') n-=colrow;
 		if (min_up == 0 && to == 'up') n+=colrow;
 		
 		//стирание объекта
@@ -276,21 +276,22 @@ function active_z()
 		//прорисовка объекта
 		for (var i=0; i < 4; i++)
 		{
-			what[i]+=n;
+			what[i]+=n; //само перемещение
 			colored($(".dot").get(what[i]), color_light);
 		}
 		//передача управления новому объекту при окончательном падении объекта
-		if ((min_bottom == 0 || min == 0) && to == 'down')
+		if ((min_bottom == 0 || min_wall == 0) && to == 'down')
 		{
 			//сначала проверяем game_over
-			if (zero_line_overflow())
+			if (zero_line_overflow())//запускаем фунцию проверки заполненности последней строки, которая возвращает булевское значение
 			{
-				pause(zero_line_overflow());//постановка на паузу
+				pause(zero_line_overflow());//постановка на паузу без вожможности снять с неё
 				alert("GAME OVER! \n You`re score is "+score+" lines.");
-				start=true; //включаем возможность пользоваться new game`
 			}
+
 			for (var i=0; i < 4; i++)
-			$($(".dot").get(what[i])).toggleClass('wall',true);//объект превращается в wall
+				$($(".dot").get(what[i])).toggleClass('wall',true);//объект превращается в wall
+
 			line_control();//запуск считывания линий
 			active_z(); //активация нового объекта
 		}
@@ -361,11 +362,10 @@ function line_control()
 	}
 
 //функция проверки условий окончания игры
-var zero;
 function zero_line_overflow()
 	{
-		zero = false;
-		for (i=0; i <10; i++)
+		var zero = false;
+		for (i=0; i <10; i++) //от 0 до 9 это индексы самой верхней строки
 		zero = ($($(".dot").get(i)).attr('class') == 'dot wall') ? true : zero;
 		return zero;
 	}

@@ -1,5 +1,5 @@
-$fst_color: blue
-$snd_color: white
+$dark_color: rgb(10, 50, 130)
+$light_color: rgb(200, 120, 0)
 
 $dots_row: 20 //количество точек в строке/столбце квадрата
 $bw: .2% //для расстояний между точками
@@ -9,16 +9,24 @@ $wh: 100/$dots_row - $bw //подсчёт процентного составл�
 //////////////////////////////////////////////
 
 body
-	background-color: #1a528a
+	background-color: rgb(25, 82, 138)
 	font-family: arial
 	font-weight: bold
+	text-align: center
+	transition-property: background-color
+	transition-duration: 0.8s
+
+header
+	display: flex
+	height: 100px
+	justify-content: center
+
 
 //основной контейнер для позиционирования квадрата с активной областью
 #container
 	display: flex
 	height: 500px
 	justify-content: center
-	padding-top: 100px
 	width: 100%
 
 	.box //квадрат содержащий активные области
@@ -32,16 +40,15 @@ body
 
 		.dot //активные пиксели
 			border-radius: 8px
-			background-color: blue
+			background-color: $dark_color
 			color: whitesmoke
 			font-size: 18px
 			line-height: 200%
-			text-align: center
 			height: $wh
 			width: $wh
 
 		.dot.wall //пиксели интерфейса
-			background-color: $snd_color
+			background-color: $light_color
 
 .after
 	height: 100px
@@ -51,13 +58,16 @@ body
 
 	#start, #pause
 		border-radius: 5px
-		background-color: $snd_color
-		color: $fst_color
+		background-color: $dark_color
+		color: $light_color
 		cursor: pointer
 		font-weight: bold
 		padding: 10px
 		margin: 0 10px
 
 	#start:hover, #pause:hover
-		background-color: $fst_color
-		color: $snd_color
+		background-color: $light_color
+		color: $dark_color
+
+footer
+	font-family: "Times New Roman"
