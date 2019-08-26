@@ -111,8 +111,9 @@ $(document).ready(function() {
 			if (e.key == 'ArrowRight') direct('right',z_object);//направо
 			if (e.key == 'ArrowUp') rotater(z_object); //кнопка поворота объекта
 			if (e.key == 'ArrowDown') for (i=0;i<2;i++) direct('down',z_object); //кнопка ускорения
-			if (e.key == 'Escape') pause(zero_line_overflow()); //пауза
 		}
+
+		if (e.key == 'Escape') pause(zero_line_overflow()); //пауза
 	});
 
 });
@@ -127,7 +128,7 @@ function new_game()
 		$('.dot').css('opacity','1');//возврат к нормальному виду если была пауза
 		line_control_array(true);//зачищаем основное пространство
 		score = 0;//зачистка количества очков
-		$($(".dot").get(38)).html(score);//вывод очков
+		line_counter_display(score);//вывод очков
 		active_z();//активация первой фигуры
 		clearInterval(timer);//сброс таймера движения
 		auto_down(speed); //активация движения
@@ -136,7 +137,7 @@ function new_game()
 //функция паузы
 function pause(overflow)
 	{
-		if (onoff)
+		if ((onoff) && !(nopause))
 		{
 			onoff = false;
 			clearInterval(timer);
@@ -153,9 +154,24 @@ function pause(overflow)
 		}
 	}
 
+//функция вывода количества собранных линий
+
+function line_counter_display(score_in)
+	{
+		var title='LINES';
+		for (var i = 0; i < title.length; i++)
+			$($(".dot").get(i+32)).html(title[i]);
+
+		title = String(score_in);
+		for (var i = 0; i < title.length; i++)
+			$($(".dot").get(58+i-title.length+1)).html(title[i]);
+	}
+
 //функция автозапуска падения блоков
+var nopause = true; //переменная состояния отмены включения паузы до начала игры
 function auto_down(speed_in_function) {
 	timer = setInterval("direct('down', z_object)", speed_in_function);
+	nopause = false;
 }
 
 /////////////БЛОК CМЕНЫ ЦВЕТОВ////////////////////
@@ -319,7 +335,7 @@ function line_control()
 					$($(".dot").get(lines[i][j])).toggleClass('wall',false);//убираем значение wall
 				}
 				score++;//прибавляем очко
-				$($(".dot").get(38)).html(score); //выводим значение собраных линий на экран
+				line_counter_display(score); //выводим значение собраных линий на экран
 
 				var line_to_switch = new Array(),//объявление рабочего внутрициклового буферного массива
 						line_i = 0; //индекс для этого же массива
