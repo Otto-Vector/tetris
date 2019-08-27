@@ -2,13 +2,14 @@ var color_light = 'rgb(200, 120, 0)',
 	 color_dark = 'rgb(10, 50, 130)',
 	 colrow = 20, //количество строк/столбцов в активной зоне
 	 rotate_index = 0;//коэффициент итерации поворота объекта //не изменять!
-	 speed = 1000, //скорость падения фигур
+	 speed = 850, //скорость падения фигур
 	 timer = true, //глобально для прекращения цикла
 	 lines = [], //массив для контроля строк
 	 score = 0,//переменная количества собранных линий
 	 figure_index = 0, //активация переменной индекса рандомного объекта
 	 z_object = [0,0,0,0], //активация массива активной фигуры
-	 onoff = true; //переменная состояния для паузы
+	 onoff = false, //переменная состояния отмены включения паузы до начала игры
+	 move_down = false; //индикатор движения
 
 //базовые данные фигур
 var figure_constant = [
@@ -102,15 +103,15 @@ $(document).ready(function() {
 	//пауза
 	$("#pause").click(function(){ pause(zero_line_overflow()); }); //overflow для того чтобы пауза не отжималась по окончании игры
 
-		$("#left").click(function() { if ((onoff) && !(nopause)) direct('left',z_object); });
-		$("#right").click(function() { if ((onoff) && !(nopause)) direct('right',z_object); });
-		$("#flip").click(function() { if ((onoff) && !(nopause)) rotater(z_object); });
-		$("#down").click(function() { if ((onoff) && !(nopause)) for (i=0;i<3;i++) direct('down',z_object); });
+		$("#left").click(function() { if (move_down) direct('left',z_object); });
+		$("#right").click(function() { if (move_down) direct('right',z_object); });
+		$("#flip").click(function() { if (move_down) rotater(z_object); });
+		$("#down").click(function() { if (move_down) for (i=0;i<3;i++) direct('down',z_object); });
 
 	//считывание клавиатуры
 	window.addEventListener('keydown', function(e)
 	{
-		if ((onoff) && !(nopause)) //блокировка кнопок при паузе
+		if (move_down) //блокировка кнопок при паузе
 		{
 			if (e.key == 'ArrowLeft') direct('left',z_object);//налево
 			if (e.key == 'ArrowRight') direct('right',z_object);//направо
@@ -128,7 +129,7 @@ $(document).ready(function() {
 //функция для зачистки пространства перед новой игрой
 function new_game()
 	{
-		onoff = true;//снимаем с паузы
+		onoff = true;//показываем что new_game в деле
 		$('body').css('backgroundColor','black');//затемнение остального пространства
 		$('.dot').css('opacity','1');//возврат к нормальному виду если была пауза
 		line_control_array(true);//зачищаем основное пространство
@@ -136,24 +137,24 @@ function new_game()
 		line_counter_display(score);//вывод очков
 		active_z();//активация первой фигуры
 		clearInterval(timer);//сброс таймера движения
-		auto_down(speed); //активация движения
+		move_down = auto_down(speed); //активация движения
 	}
 
 //функция паузы
 function pause(overflow)
 	{
-		if ((onoff) && !(nopause))
+		if (move_down)
 		{
-			onoff = false;
+			move_down = false;
 			clearInterval(timer);
 			$('.dot').css('opacity','0.2');//"затемнение" на паузе
 			$('body').css('backgroundColor','rgb(25, 82, 138)');// восстановление цвета заднего фона
 		}
-		else if (!(onoff) && !(overflow)) //если конец игры, то с паузы не снимается
+		else if ((onoff) && !(overflow)) //если конец игры, то с паузы не снимается
 		{
-			onoff = true;
+			console.log("else!");
 			clearInterval(timer);
-			auto_down(speed);
+			move_down = auto_down(speed); //true
 			$('.dot').css('opacity','1');//возврат к нормальному виду
 			$('body').css('backgroundColor','black');// затемнение цвета заднего фона
 		}
@@ -173,10 +174,10 @@ function line_counter_display(score_in)
 	}
 
 //функция автозапуска падения блоков
-var nopause = true; //переменная состояния отмены включения паузы до начала игры
+
 function auto_down(speed_in_function) {
 	timer = setInterval("direct('down', z_object)", speed_in_function);
-	nopause = false;
+	return true;
 }
 
 /////////////БЛОК CМЕНЫ ЦВЕТОВ////////////////////
