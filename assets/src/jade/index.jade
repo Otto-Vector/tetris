@@ -8,42 +8,40 @@ head
 	link(rel='stylesheet' href='css/main.min.css')
 	title Tetris by Otto-Vector
 body
-	header
-		h1 TETRIS CLASSIC
-	#container
-		.box
-			- for (var i=0; i<400; i++) {
-				if ((i%10 == 0) && (i%20 != 0))
-					.dot.wall 
-				else
-					.dot
-			- }
-
-	.after
-		.left
-			#left
-				div Left
-		.center
+	#megacontainer
+		header
+			h1 TETRIS CLASSIC
+		#container
+			.left
+				button#down down
+				button#left left
+			#center
+				.center
+					.box_wraper
+						.box
+							- for (var i=0; i<400; i++) {
+								if ((i%10 == 0) && (i%20 != 0))
+									.dot.wall 
+								else
+									.dot
+							- }
+			.right
+				button#flip flip
+				button#right right
+		.after
 			#start NEW GAME
 			#pause PAUSE
-		.right
-			#right
-				div Right
-	.bottom
-		#down
-			div Down
-		#flip
-			div Flip
 
-	footer
-		h3 HOW TO PLAY
-		p Use 
-			u "Left/Right Arrow" 
-			| keys to move it horizontal
-		p Use 
-			u "Up" 
-			| key to flip it
-		p Use 
-			u "Down" 
-			| key to acceleration down
+
+	//- footer
+	//- 	h3 HOW TO PLAY
+	//- 	p Use 
+	//- 		u "Left/Right Arrow" 
+	//- 		| keys to move it horizontal
+	//- 	p Use 
+	//- 		u "Up" 
+	//- 		| key to flip it
+	//- 	p Use 
+	//- 		u "Down" 
+	//- 		| key to acceleration down
 	script(src='js/main.min.js')

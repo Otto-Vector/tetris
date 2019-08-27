@@ -106,7 +106,7 @@ $(document).ready(function() {
 		$("#left").click(function() { if (move_down) direct('left',z_object); });
 		$("#right").click(function() { if (move_down) direct('right',z_object); });
 		$("#flip").click(function() { if (move_down) rotater(z_object); });
-		$("#down").click(function() { if (move_down) for (i=0;i<3;i++) direct('down',z_object); });
+		$("#down").click(function() { if (move_down) for (i=0;i<5;i++) direct('down',z_object); });
 
 	//считывание клавиатуры
 	window.addEventListener('keydown', function(e)
@@ -116,7 +116,7 @@ $(document).ready(function() {
 			if (e.key == 'ArrowLeft') direct('left',z_object);//налево
 			if (e.key == 'ArrowRight') direct('right',z_object);//направо
 			if (e.key == 'ArrowUp') rotater(z_object); //кнопка поворота объекта
-			if (e.key == 'ArrowDown') for (i=0;i<2;i++) direct('down',z_object); //кнопка ускорения
+			if (e.key == 'ArrowDown') for (i=0;i<3;i++) direct('down',z_object); //кнопка ускорения
 		}
 
 		if (e.key == 'Escape') pause(zero_line_overflow()); //пауза
