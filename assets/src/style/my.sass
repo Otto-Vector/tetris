@@ -27,9 +27,9 @@ header
 
 #container
 	display: flex
-	justify-content: space-between
+	justify-content: space-around
 	#center
-		width: 500px
+		width: 520px
 		font-size: 18px
 		.center
 			display: flex
@@ -47,8 +47,8 @@ header
 					flex-wrap: wrap
 					justify-content: space-around
 					transition-duration: .6s
-					width: 98%
-					height: 98%
+					width: 99%
+					height: 99%
 					margin: auto
 					position: absolute
 					top: 0
@@ -103,7 +103,6 @@ header
 	color: $dark_color
 
 footer
-	font-family: "Times New Roman"
 	display: none
 
 
@@ -115,32 +114,32 @@ footer
 	header
 		display: block
 
-@media (max-width: 500px)
+@media screen and (max-width: 500px)
 	#left, #right, #flip, #down
 		height: 50px
 		width: 50px
 
-@media (max-height: 500px)
+@media screen and (max-height: 520px)
 	#container #center
 		width: 450px
 		font-size: 16px
 
-@media (max-height: 450px)
+@media screen and (max-height: 450px)
 	#container #center
 		width: 400px
 		font-size: 14px
 
-@media (max-height: 400px)
+@media screen and (max-height: 400px)
 	#container #center
 		width: 300px
 		font-size: 12px
 
-@media (max-height: 350px)
+@media screen and (max-height: 350px)
 	#container #center
 		width: 300px
 		font-size: 10px
 
-@media (max-height: 300px)
+@media screen and (max-height: 300px)
 	#container #center
 		width: 250px
 		font-size: 9px
