@@ -103,20 +103,22 @@ $(document).ready(function() {
 	//пауза
 	$("#pause").click(function(){ pause(zero_line_overflow()); }); //overflow для того чтобы пауза не отжималась по окончании игры
 
-		$("#left").click(function() { if (move_down) direct('left',z_object); });
-		$("#right").click(function() { if (move_down) direct('right',z_object); });
-		$("#flip").click(function() { if (move_down) rotater(z_object); });
-		$("#down").click(function() { if (move_down) for (i=0;i<5;i++) direct('down',z_object); });
+		$("#left").click(function() { if (move_down) direct('left',z_object); }); //move_down проверяет в процессе ли движение игры
+		$("#right").click(function() { if (move_down) direct('right',z_object); }); //move_down проверяет в процессе ли движение игры
+		$("#flip").click(function() { if (move_down) rotate_index = rotater(z_object,rotate_index); }); //move_down проверяет в процессе ли движение игры
+		$("#down").click(function() { if (move_down) for (i=0;i<6;i++) direct('down',z_object); }); //move_down проверяет в процессе ли движение игры
 
 	//считывание клавиатуры
 	window.addEventListener('keydown', function(e)
 	{
-		if (move_down) //блокировка кнопок при паузе
+//		if (move_down) //блокировка кнопок при паузе
 		{
 			if (e.key == 'ArrowLeft') direct('left',z_object);//налево
 			if (e.key == 'ArrowRight') direct('right',z_object);//направо
-			if (e.key == 'ArrowUp') rotater(z_object); //кнопка поворота объекта
-			if (e.key == 'ArrowDown') for (i=0;i<3;i++) direct('down',z_object); //кнопка ускорения
+			if (e.key == 'ArrowUp') direct('up',z_object);
+												//rotate_index = rotater(z_object,rotate_index); //кнопка поворота объекта
+			if (e.key == 'ArrowDown') //for (i=0;i<5;i++)
+												direct('down',z_object); //кнопка ускорения
 		}
 
 		if (e.key == 'Escape') pause(zero_line_overflow()); //пауза
@@ -126,7 +128,8 @@ $(document).ready(function() {
 ///////////////////////////////////////////////////
 
 //////////////ФУНКЦИИ ЗАПУСКА/ПАУЗЫ ИГРЫ////////////////////////////
-//функция для зачистки пространства перед новой игрой
+
+//функция для зачистки пространства перед новой игрой и нового/первого запуска
 function new_game()
 	{
 		onoff = true;//показываем что new_game в деле
@@ -141,19 +144,17 @@ function new_game()
 	}
 
 //функция паузы
-function pause(overflow)
+function pause(overflow)//overflow логическая функция для проверки конца игры
 	{
 		if (move_down)
 		{
 			move_down = false;
-			clearInterval(timer);
+			clearInterval(timer);//сброс запущеной функции таймера
 			$('.dot').css('opacity','0.2');//"затемнение" на паузе
 			$('body').css('backgroundColor','rgb(25, 82, 138)');// восстановление цвета заднего фона
 		}
 		else if ((onoff) && !(overflow)) //если конец игры, то с паузы не снимается
 		{
-			console.log("else!");
-			clearInterval(timer);
 			move_down = auto_down(speed); //true
 			$('.dot').css('opacity','1');//возврат к нормальному виду
 			$('body').css('backgroundColor','black');// затемнение цвета заднего фона
@@ -168,7 +169,7 @@ function line_counter_display(score_in)
 		for (var i = 0; i < title.length; i++)
 			$($(".dot").get(i+32)).html(title[i]);
 
-		title = String(score_in);
+		title = String(score_in).padStart(3,'0');
 		for (var i = 0; i < title.length; i++)
 			$($(".dot").get(58+i-title.length+1)).html(title[i]);
 	}
@@ -199,8 +200,8 @@ function auto_down(speed_in_function) {
 
 /////активация нового объекта///////
 figure_index = Math.floor((Math.random()*figure.length));//случайный индекс объекта
-var previous_figure_index;
-var previous_figure_rotate_index = 0;
+var previous_figure_index;//для передачи значения предыдущего объекта
+var previous_figure_rotate_index = 0;//для передачи значения предыдущего объекта
 function active_z()
 {	
 	previous_figure_index = figure_index; //костыль для rotatera по пердаче объекта
@@ -223,35 +224,52 @@ function active_z()
 
 	//поворот изначального состояния следующего объекта
 	previous_figure_rotate_index = 0;//обнуление поворота
-	var rand = Math.floor((Math.random()*5));//случайное положение поворота
-	for (var i=0; i < rand; i++)
+	var rand = Math.floor((Math.random()*5));//случайное количество исполнений положения поворота
+
+	for (var i=0; i < rand; i++)//реализация поворота фигуры внутри интерфейса на случайное количество
 		{
-			previous_figure_rotate_index = (previous_figure_rotate_index !== 3) ? ++previous_figure_rotate_index : 0;
-			for (var ii=0; ii <4; ii++)
-				figure[figure_index][ii] += figure_rotater[figure_index][previous_figure_rotate_index][ii];
+			previous_figure_rotate_index = (previous_figure_rotate_index !== 3) ? ++previous_figure_rotate_index : 0;//карусель 0-1-2-3
+			for (var j=0; j <4; j++) //сам поворот фигуры
+				figure[figure_index][j] += figure_rotater[figure_index][previous_figure_rotate_index][j];
 		}
-	//прорисовка справа следующей фигуры
+	//прорисовка следующей фигуры
 	for (var i=0; i < 4; i++)
 		colored($(".dot").get(figure[figure_index][i]+(colrow*7)+10), color_light);
 }
 
-///////////////--Поворот объекта--//////////////////////////
-	function rotater(what_rotate)
-	{
-		//зацикливание индекса поворота 1-2-3-0 //и смена его значения на ++
-		rotate_index = (rotate_index !== 3) ? ++rotate_index : 0;
-		var turn = figure_rotater[previous_figure_index][rotate_index];//уменьшение размера переменной
-
-		//проверка на столкновение с препятствиями
-		var min_left = 1,	min = 1,	min_bottom = 1;
+///////////////////функция проверки на столкновение с объектами///////////
+function way_free(what_rotate_in, turn_in) {
+var free_spaces = true;
 		for (var i=0; i < 4; i++)
 		{
-			min_left = ((what_rotate[i] + turn[i]) % 20 - 19 == 0 ) ? 0 : min_left; //CТЕНА СЛЕВА
-			min = ($($(".dot").get(what_rotate[i] + turn[i])).attr("class") == 'dot wall') ? 0 : min; //твёрдый объект .wall рядом
-			min_bottom = (what_rotate[i] + turn[i] > 399 ) ? 0 : min_bottom;//ПОЛ СНИЗУ
+			free_spaces = ((what_rotate_in[i] + turn_in[i]) % 20 - 19 == 0 ) ? false : free_spaces; //CТЕНА СЛЕВА
+			//free_spaces = ((what_rotate_in[i] + turn_in[i]) % 10 == 0 ) ? false : free_spaces; //CТЕНА СПРАВА
+			free_spaces = ($($(".dot").get(what_rotate_in[i] + turn_in[i])).attr("class") == 'dot wall') ? false : free_spaces; //твёрдый объект .wall рядом
+			free_spaces = (what_rotate_in[i] + turn_in[i] > 399 ) ? false : free_spaces;//ПОЛ СНИЗУ
+			free_spaces = (what_rotate_in[i]+ turn_in[i] < 1 ) ? false : free_spaces;//прoверка для корректировки положения проявленой фигуры
 		}
+	return free_spaces;
+}
 
-		if ((min_left !== 0) && (min !== 0) && (min_bottom !== 0))
+
+///////////////--Поворот объекта--//////////////////////////
+	function rotater(what_rotate, rotate_index_in)
+	{
+		//зацикливание индекса поворота 1-2-3-0 //и смена его значения на ++
+		rotate_index_in = (rotate_index_in !== 3) ? ++rotate_index_in : 0;
+		var turn = figure_rotater[previous_figure_index][rotate_index_in];//уменьшение размера переменной
+
+		//проверка на столкновение с препятствиями
+		// var min_left = 1,	min = 1,	min_bottom = 1;
+		// for (var i=0; i < 4; i++)
+		// {
+		// 	min_left = ((what_rotate[i] + turn[i]) % 20 - 19 == 0 ) ? 0 : min_left; //CТЕНА СЛЕВА
+		// 	min = ($($(".dot").get(what_rotate[i] + turn[i])).attr("class") == 'dot wall') ? 0 : min; //твёрдый объект .wall рядом
+		// 	min_bottom = (what_rotate[i] + turn[i] > 399 ) ? 0 : min_bottom;//ПОЛ СНИЗУ
+		// }
+//		if ((min_left !== 0) && (min !== 0) && (min_bottom !== 0)) //если не сработали индексы препятствий
+
+		if (way_free(what_rotate,turn))
 		{
 			for (var i=0; i < 4; i++)
 			{
@@ -264,32 +282,36 @@ function active_z()
 			for (var i=0; i < 4 ; i++)
 				colored($(".dot").get(what_rotate[i]), color_light);
 		}
-		else {rotate_index = (rotate_index !== 0) ? --rotate_index : 3;} //если препятствие, то индекс минусуется
+		else {rotate_index_in = (rotate_index_in !== 0) ? --rotate_index_in : 3;} //если препятствие, то индекс минусуется
+
+		return rotate_index_in;
 	}
 
 ////////////////--Перемещение объектов--///////////////////////////////
 	function direct(to, what)
 	{
-		var n =  (to == 'down') ? colrow : //значение смещения вниз
+		var move_it =  (to == 'down') ? colrow : //значение смещения вниз
 					(to == 'up') ? -colrow : //значение смещения вверх (для корректировки появляющихся фигур)
 					(to == 'left') ? -1 : 1; //либо налево/направо
+		var move_it_array=[move_it,move_it,move_it,move_it];//адаптация перемещения в массив для функции проверки препятствий
 
 		//проверка на препятствия
-		var min_left = 1,	min_wall = 1,	min_bottom = 1, min_up = 1;
-		for (var i=0; i < 4; i++)
-		{
-		min_left = (what[i] % 20 == 0 ) ? 0 : min_left; //CТЕНА СЛЕВА
-		min_wall = ($($(".dot").get(what[i]+n)).attr("class") == 'dot wall') ? 0 : min_wall; //твёрдый объект .wall рядом
-		min_bottom = (what[i]+n > 399 ) ? 0 : min_bottom;//ПОЛ СНИЗУ
-		min_up = (what[i]+n < 1 ) ? 0 : min_up;//прoверка для корректировки положения проявленой фигуры
-		}
+		// var min_left = 1,	min_wall = 1,	min_bottom = 1, min_up = 1;
+		// for (var i=0; i < 4; i++)
+		// {
+		// min_left = (what[i] % 20 == 0 ) ? 0 : min_left; //CТЕНА СЛЕВА
+		// min_wall = ($($(".dot").get(what[i]+n)).attr("class") == 'dot wall') ? 0 : min_wall; //твёрдый объект .wall рядом
+		// min_bottom = (what[i]+n > 399 ) ? 0 : min_bottom;//ПОЛ СНИЗУ
+		// min_up = (what[i]+n < 1 ) ? 0 : min_up;//прoверка для корректировки положения проявленой фигуры
+		// }
 
 		//корректировка перемещения от препятствий
-		if ((min_left == 0 || min_wall == 0) && to == 'left') ++n;
-		if (min_wall == 0 && to == 'right') --n;
-		if ((min_bottom == 0 || min_wall == 0) && to == 'down') n-=colrow;
-		if (min_up == 0 && to == 'up') n+=colrow;
-		
+		// if ((min_left == 0 || min_wall == 0) && to == 'left') ++n;
+		// if (min_wall == 0 && to == 'right') --n;
+		// if ((min_bottom == 0 || min_wall == 0) && to == 'down') n-=colrow;
+		// if (min_up == 0 && to == 'up') n+=colrow;
+
+		if (!way_free(what,move_it_array) && (to !== 'down')) move_it_array =[0,0,0,0];
 		//стирание объекта
 		for (var i=0; i < 4; i++)
 		{
@@ -298,11 +320,12 @@ function active_z()
 		//прорисовка объекта
 		for (var i=0; i < 4; i++)
 		{
-			what[i]+=n; //само перемещение
+			what[i]+=move_it_array[i]; //само перемещение
 			colored($(".dot").get(what[i]), color_light);
 		}
 		//передача управления новому объекту при окончательном падении активного
-		if ((min_bottom == 0 || min_wall == 0) && to == 'down')
+		//if ((min_bottom == 0 || min_wall == 0) && to == 'down')
+		if ((!way_free(what,move_it_array)) && to == 'down')
 		{
 			//сначала проверяем game_over
 			if (zero_line_overflow())//запускаем фунцию проверки заполненности последней строки, которая возвращает булевское значение
