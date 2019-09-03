@@ -82,8 +82,9 @@ function line_control_array(clear)
 	}
 }
 
-
-///////////////////ИСПОЛНИТЕЛЬНЫЙ БЛОК///////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////ИСПОЛНИТЕЛЬНЫЙ БЛОК////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 $(document).ready(function() {
 
 	line_control_array(); //создание массива line
@@ -102,7 +103,7 @@ $(document).ready(function() {
 		$("#right").click(function() { if (move_down) direct('right',z_object); }); //move_down проверяет в процессе ли движение игры
 		$("#flip").click(function() { if (move_down) rotate_index = rotater(z_object,rotate_index); }); //move_down проверяет в процессе ли движение игры
 		$("#down").click(function() {	if (move_down) fast_down(5); }); //move_down проверяет в процессе ли движение игры
-		$("#super_down").click(function() {	if (move_down) fast_down(colrow); }); //move_down проверяет в процессе ли движение игры
+		$(".box").click(function() {	if (move_down) fast_down(colrow); }); //при касании на игровой экран, объект "слетает вниз"
 
 	//считывание клавиатуры
 	window.addEventListener('keydown', function(e)
@@ -120,7 +121,9 @@ $(document).ready(function() {
 	});
 
 });
-///////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 
 
 //////////////ФУНКЦИИ ЗАПУСКА/ПАУЗЫ/ОКОНЧАНИЯ ИГРЫ//////////////////////////////////////////
@@ -139,7 +142,7 @@ function new_game()
 		move_down = auto_down(speed); //активация движения
 	}
 
-///////////////////функция ПАУЗЫ//////////////////////////////////////////
+///////////////////Функция ПАУЗЫ//////////////////////////////////////////
 function pause(overflow)//overflow логическая функция для проверки конца игры передаётся в паузу
 {
 	if (move_down)
@@ -182,7 +185,7 @@ function colorSwitch(object)
 	colored(object,color);
 }
 
-///////функция окрашивания////////////////////
+//////////функция окрашивания////////////////////
 function colored(object,color)
 {
 	$(object).css('backgroundColor',color);
@@ -240,11 +243,13 @@ function rotater(what_rotate, rotate_index_in)
 	//уменьшение размера описания переменной
 	var move_it_array = figure_rotater[previous_figure_index][rotate_index_in];
 
+	way_free(what_rotate,move_it_array,true);
+
 	if (way_free(what_rotate,move_it_array))//запуск логической функции на свободное пространство для маневра
 	{
 		for (var i=0; i < 4; i++)
 		{	//зачистка пространства
-			colored($(".dot").get(what_rotate[i]), color_dark);
+			 colored($(".dot").get(what_rotate[i]), color_dark);
 			//смена значений для поворота
 			what_rotate[i] += move_it_array[i];
 		}
@@ -285,8 +290,8 @@ function direct(to, what)
 
 	//передача управления новому объекту при окончательном падении активного
 	if ((move_it_array[0] == 0) && to == 'down') //если сработало обнуление массива при передвижении вниз
-
-		end_of_movement(what); //то запускается функция обработки конца движения объекта
+		//то запускается функция обработки конца движения объекта
+		end_of_movement(what);
 
 }
 
@@ -370,17 +375,28 @@ function line_control()
 //////////////////-//ФУНКЦИИ ПРОВЕРОК УСЛОВНОСТЕЙ//-////////////////////////////////////////
 
 ///////////////////функция проверки на столкновение с объектами///////////
-function way_free(what, move_it)
+
+function way_free(what, move_it, rotate_mode)//объект фигуры, модификатор перемещения, режим отскока при повороте от стен/потолка
 {
-	var free_spaces = true; //переменная свободного пространства
-		for (var i=0; i < 4; i++)
+	var free_spaces = [true,true,true,true]; //массив переменных свободного пространства
+
+	for (var i=0; i < 4; i++)
+	{
+		free_spaces[0] = ((what[i] + move_it[i]) % 20 - 19 === 0 ) ? false : free_spaces[0]; //CТЕНА СЛЕВА
+		free_spaces[1] = (what[i] + move_it[i] < 0 ) ? false : free_spaces[1]; //КРЫША СВЕРХУ
+		free_spaces[2] = ((what[i] + move_it[i]) % 20 - 10 === 0 ) ? false : free_spaces[2]; //СТЕНА СПРАВА
+		free_spaces[3] = (what[i] + move_it[i] > 399 ) ? false : free_spaces[3];//ПОЛ СНИЗУ
+		free_spaces[3] = ($($(".dot").get(what[i] + move_it[i])).attr("class") == 'dot wall') ? false : free_spaces[3]; //твёрдый объект .wall рядом
+	}
+
+		if (rotate_mode) //режим отскока
 		{
-			free_spaces = ((what[i] + move_it[i]) % 20 - 19 == 0 ) ? false : free_spaces; //CТЕНА СЛЕВА
-			free_spaces = ($($(".dot").get(what[i] + move_it[i])).attr("class") == 'dot wall') ? false : free_spaces; //твёрдый объект .wall рядом
-			free_spaces = (what[i] + move_it[i] > 399 ) ? false : free_spaces;//ПОЛ СНИЗУ
-			free_spaces = (what[i]+ move_it[i] < 1 ) ? false : free_spaces;//прoверка для корректировки положения проявленой фигуры
-		}//если хоть в одной проверке вышло false, то она останется в переменной free_spaces
-	return free_spaces; 
+			if (!free_spaces[0]) direct('right', what); //отскок фигуры от стены направо
+			else if (!free_spaces[1]) direct('down', what);//отскок фигуры вниз
+			else if (!free_spaces[2]) direct('left', what);//отскок фигуры от стены налево
+		}
+
+	return (free_spaces[0] && free_spaces[1] && free_spaces[2] && free_spaces[3]);
 }
 
 ////////////////функция проверки условий окончания игры/////////////////////////
