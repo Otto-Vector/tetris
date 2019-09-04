@@ -66,7 +66,6 @@ var gulp = require('gulp'),  // подключаем Gulp
     jadeInheritance = require('gulp-pug-inheritance'), // аппаратная поддержка конвертации при больших объёмах файлов
     jsonminify = require('gulp-jsonminify'), // минификация json файлов
     htmlmin = require('gulp-htmlmin'); // минификатор html
-//    phpmin = require('@cedx/gulp-php-minify');// минификатор php использует ES6 стандарт поэтому пока отключен
 
 /* задачи */
 
@@ -148,21 +147,21 @@ gulp.task('js:build', function () {
 //         .pipe(gulp.dest(path.build.fonts));
 // });
 
-// обработка картинок
-// gulp.task('image:build', function () {
-//     return gulp.src(path.src.img) // путь с исходниками картинок
-//         .pipe(cache(imagemin([ // сжатие изображений
-//             imagemin.gifsicle({ interlaced: true }),
-//             jpegrecompress({
-//                 progressive: true,
-//                 max: 90,
-//                 min: 80
-//             }),
-//             pngquant(),
-//             imagemin.svgo({ plugins: [{ removeViewBox: false }] })
-//         ])))
-//         .pipe(gulp.dest(path.build.img)); // выгрузка готовых файлов
-// });
+//обработка картинок
+gulp.task('image:build', function () {
+    return gulp.src(path.src.img) // путь с исходниками картинок
+        .pipe(cache(imagemin([ // сжатие изображений
+            imagemin.gifsicle({ interlaced: true }),
+            jpegrecompress({
+                progressive: true,
+                max: 90,
+                min: 80
+            }),
+            pngquant(),
+            imagemin.svgo({ plugins: [{ removeViewBox: false }] })
+        ])))
+        .pipe(gulp.dest(path.build.img)); // выгрузка готовых файлов
+});
 
 // // перенос json контента
 // gulp.task('json:build', function () {
@@ -193,7 +192,7 @@ gulp.task('build',
             'css:build',
             'js:build',
 //            'fonts:build',
-//            'image:build',
+           'image:build',
 //            'json:build',
         )
     )
@@ -205,7 +204,7 @@ gulp.task('watch', function () {
     gulp.watch(path.watch.html, gulp.series('html:build'));
     gulp.watch(path.watch.css, gulp.series('css:build'));
     gulp.watch(path.watch.js, gulp.series('js:build'));
-//    gulp.watch(path.watch.img, gulp.series('image:build'));
+   gulp.watch(path.watch.img, gulp.series('image:build'));
 //    gulp.watch(path.watch.fonts, gulp.series('fonts:build'));
 //    gulp.watch(path.watch.json, gulp.series('json:build'));
     gulp.watch(path.watch.php, gulp.series('php:build'));

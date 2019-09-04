@@ -22,18 +22,18 @@ var figure_constant = [
 								[4,5,23,24], //Z - зеркальная
 								[4,24,25,26], //Г
 								[6,24,25,26], //Г зеркальная
-								[5,24,25,26] //четвёрка _~_
+								[5,24,25,26] //четвёрка _=_
 							];
 
 //операбельные данные фигур//
 var 			figure = [
-								[4,5,24,25],
-								[23,24,25,26],
-								[4,5,25,26],
-								[4,5,23,24],
-								[4,24,25,26],
-								[6,24,25,26],
-								[5,24,25,26]
+								[4,5,24,25], //квадрат
+								[23,24,25,26], //линия
+								[4,5,25,26], //Z
+								[4,5,23,24], //Z - зеркальная
+								[4,24,25,26], //Г
+								[6,24,25,26], //Г зеркальная
+								[5,24,25,26] //четвёрка _=_
 							];
 
 //массив для поворота объектов//
@@ -54,7 +54,7 @@ var figure_rotater = [
 			[ [0,0,0,-19], [0,1,1,19], [19,0,0,0], [-19,-1,-1,0] ] //четвёрка _~_
 		];
 
-//обновление данных о начальном положении фигур//
+//////обновление данных о начальном положении фигур//////
 function fig_const()
 {
 	for (var i=0; i < figure_constant.length; i++)
@@ -62,8 +62,8 @@ function fig_const()
 			figure[i][j] = figure_constant[i][j];
 }
 
-//создание массива данных контрольной области для проверки линий
-//clear отвечает за функцию полной очистки при новом старте программы
+//создание массива данных контрольной области для проверки линий/////////
+//clear логически отвечает за функцию полной очистки при новом старте программы///
 function line_control_array(clear)
 {
 	for (var i = 0; i < colrow; i++)
@@ -96,8 +96,10 @@ $(document).ready(function() {
 
 	//запуск игры
 	$("#start").click(function() { new_game(); });
+	$(".start").click(function() { new_game(); });
 	//пауза
 	$("#pause").click(function(){ pause(zero_line_overflow()); }); //overflow для того чтобы пауза не отжималась по окончании игры
+	$(".pause").click(function(){ pause(zero_line_overflow()); }); //overflow для того чтобы пауза не отжималась по окончании игры
 
 		$("#left").click(function() { if (move_down) direct('left',z_object); }); //move_down проверяет в процессе ли движение игры
 		$("#right").click(function() { if (move_down) direct('right',z_object); }); //move_down проверяет в процессе ли движение игры
@@ -376,7 +378,7 @@ function line_control()
 
 ///////////////////функция проверки на столкновение с объектами///////////
 
-function way_free(what, move_it, rotate_mode)//объект фигуры, модификатор перемещения, режим отскока при повороте от стен/потолка
+function way_free(what, move_it, rebound_mode)//объект фигуры, модификатор перемещения, режим отскока при повороте от стен/потолка
 {
 	var free_spaces = [true,true,true,true]; //массив переменных свободного пространства
 
@@ -389,7 +391,7 @@ function way_free(what, move_it, rotate_mode)//объект фигуры, мод
 		free_spaces[3] = ($($(".dot").get(what[i] + move_it[i])).attr("class") == 'dot wall') ? false : free_spaces[3]; //твёрдый объект .wall рядом
 	}
 
-		if (rotate_mode) //режим отскока
+		if (rebound_mode) //режим отскока
 		{
 			if (!free_spaces[0]) direct('right', what); //отскок фигуры от стены направо
 			else if (!free_spaces[1]) direct('down', what);//отскок фигуры вниз
@@ -438,7 +440,14 @@ function game_over_output(overflow)
 	if (overflow)
 	{
 		pause(overflow);//постановка на паузу без вожможности снять с неё
-		alert("GAME OVER! \n You`re score is "+score+" lines."); //вывод сообщения
+
+		var title= "GAME"
+		for (var i = 0; i < title.length; i++)
+		$($(".dot").get(i+292)).html(title[i]);
+		title = "OVER"
+		for (var i = 0; i < title.length; i++)
+		$($(".dot").get(i+315)).html(title[i]);
+		//alert("GAME OVER! \n You`re score is "+score+" lines."); //вывод сообщения
 	}
 	return overflow;
 }
