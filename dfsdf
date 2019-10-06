@@ -1,0 +1,113 @@
+[33mcommit 0143d6cd72ea63f3a876dfe295143a2f238c94da[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Tue Aug 27 15:09:19 2019 +0400
+
+    fix font-sizes
+
+[33mcommit 988a8d3158b0e2a508334a946efa5bc715d8134f[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Tue Aug 27 14:52:30 2019 +0400
+
+    buttons correct
+
+[33mcommit 9fc0b7bf40a53febb0d6ca6a87f32811bde92cfd[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Tue Aug 27 14:51:01 2019 +0400
+
+    all adaptive usability buttons
+
+[33mcommit 594cdad93572fb783eda08465a5b73329a2ccde4[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Tue Aug 27 11:49:52 2019 +0400
+
+    large buttons
+
+[33mcommit c9d52bdb326e7cbce85c1977919b662e59a3e7e5[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Tue Aug 27 10:33:17 2019 +0400
+
+    pause markers optimization done
+
+[33mcommit 87d1cfb52289b1213c7b545557c129edf7124ec5[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Tue Aug 27 01:08:01 2019 +0400
+
+    add adaptive button fix
+
+[33mcommit 58277c4914753143c6b9c781c4bbd4f5bc70f271[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Tue Aug 27 00:30:03 2019 +0400
+
+    add adaptive
+
+[33mcommit 5ae10d879a6590784b9f017c49d367e040643813[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Mon Aug 26 18:47:43 2019 +0400
+
+    complete. orange
+
+[33mcommit b0756bb4ef42928a3fdcd6aef783cd2cfac74407[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Mon Aug 26 13:04:33 2019 +0400
+
+    some usability add
+
+[33mcommit 1da677784d16122095fe76224b368f092205d1ad[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Sun Aug 25 04:04:51 2019 +0400
+
+    newgame pause ok
+
+[33mcommit d2d5e1c3bf758fcd551812c0e9257212da168a13[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Sat Aug 24 14:03:15 2019 +0400
+
+    all_work! but_no interface...
+
+[33mcommit 5d7d548e9def77082e44ad90494a1f6ef0568d31[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Fri Aug 23 17:12:57 2019 +0400
+
+    next_figure_logical_done! usability play. need to start/pause
+
+[33mcommit 3ba76a7f8a3d07f3fa95f06b2f027e4a80896ffb[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Fri Aug 23 15:03:47 2019 +0400
+
+    add_next_figure, rotater_troubles
+
+[33mcommit e932be0c0d336e080f49157c79e1413d79625436[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Fri Aug 23 13:11:58 2019 +0400
+
+    no_animate_at_all, +sqares
+
+[33mcommit 9391615f3f3a8b0eecde10e438c98a78333a82ac[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Fri Aug 23 12:46:34 2019 +0400
+
+    add_simple_gameover_to_console
+
+[33mcommit 96c11a5eaf2223f52913bbb812fa1d17d655f5bf[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Fri Aug 23 12:03:49 2019 +0400
+
+    new_object_correct_work
+
+[33mcommit f1d67f8e4d6ff5cdbcf76b6cf358d6a0e655267c[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Fri Aug 23 11:24:28 2019 +0400
+
+    animation_off
+
+[33mcommit 2f09f6ac1abc50cff2da2c7a9f3621d3d3dadae1[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Fri Aug 23 10:29:30 2019 +0400
+
+    add comment
+
+[33mcommit 4ee3a555e1c56f69642da08cb817334d0b40799f[m
+Author: Sergey Youmshanov <otto-vector@yandex.ru>
+Date:   Fri Aug 23 10:23:26 2019 +0400
+
+    work,fake_animation,no_interface,no_pause
