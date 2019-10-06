@@ -1,8 +1,13 @@
 ## FRONTEND TETRIS
+
 Основной файл с комментариями (my.js).
+
 HTML собран на jade/pug.
+
 Файл стилей - my.sass
-	<h2><a href='/assets/build/index.html'>ПОИГРАТЬ СЮДА</a></h2>
+
+<a href='https://otto-vector.github.io/tetris/assets/build/index.html'>ПОИГРАТЬ СЮДА</a>
+
 ## Требования к окружению
 Для создания окружения необходимо иметь следующие установленные инструменты:
 -	Node.js
