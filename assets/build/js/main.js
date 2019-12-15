@@ -10602,18 +10602,18 @@ return jQuery;
 ////////БЛОК РАБОТЫ С ПЕРЕМЕННЫМИ///////////////////
 
 var color_light = 'rgb(200, 120, 0)',
-	 color_dark = 'rgb(10, 50, 130)',
-	 colrow = 20, //количество строк/столбцов в активной зоне
-	 rotate_index = 0;//коэффициент итерации поворота объекта //не изменять!
-	 speed = 850, //скорость падения фигур
-	 timer = true, //глобально для прекращения цикла
-	 lines = [], //массив для контроля строк
-	 score = 0,//переменная количества собранных линий
-	 figure_index = 0, //активация переменной индекса рандомного объекта
-	 z_object = [0,0,0,0], //активация массива активной фигуры
-	 onoff = false, //переменная состояния отмены включения паузы до начала игры
-	 move_down = false, //индикатор движения
-	 event_end_of_movement = false; //глобальная переменная состояния  для проверки сработала ли функция по укладке объекта
+	color_dark = 'rgb(10, 50, 130)',
+	col_row = 20, //количество строк/столбцов в активной зоне
+	rotate_index = 0;//коэффициент итерации поворота объекта //не изменять!
+	speed = 850, //скорость падения фигур
+	timer = true, //глобально для прекращения цикла
+	lines = [], //массив для контроля строк
+	score = 0,//переменная количества собранных линий
+	figure_index = 0, //активация переменной индекса рандомного объекта
+	z_object = [0,0,0,0], //активация массива активной фигуры
+	on_off = false, //переменная состояния отмены включения паузы до начала игры
+	move_down = false, //индикатор движения
+	event_end_of_movement = false; //глобальная переменная состояния  для проверки сработала ли функция по укладке объекта
 
 //базовые данные фигур//
 var figure_constant = [
@@ -10667,12 +10667,12 @@ function fig_const()
 //clear логически отвечает за функцию полной очистки при новом старте программы///
 function line_control_array(clear)
 {
-	for (var i = 0; i < colrow; i++)
+	for (var i = 0; i < col_row; i++)
 	{
 		lines[i]= new Array();
 		for (var j = 0; j < 10; j++)
 		{
-			lines[i][j]= j+i*(colrow);
+			lines[i][j]= j+i*(col_row);
 
 			if (clear) //функция зачистки
 			{
@@ -10686,27 +10686,32 @@ function line_control_array(clear)
   ///////////////////////////////////////////////////////////////////////////////////////
  ////////////////////////////////////ИСПОЛНИТЕЛЬНЫЙ БЛОК////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
-$(document).ready(function() {
+$(document).ready(function()
+{
 
 	line_control_array(); //создание массива line
 	interface_next_figure_clear(); //создание массива для зачистки поля вывода следующей фигуры
 
-	// $(".dot").bind({ //рисование на поле
-	// 	mouseenter: function() {colorSwitch(this)}
-	// });
+	// разблокировка следующей строки позволяет рисовать мышкой на игровом поле
+	// $(".dot").bind({	mouseenter: function() {colorSwitch(this)} });
 
 	//запуск игры
 	$("#start").click(function() { new_game(); });
 	$(".start").click(function() { new_game(); });
+
 	//пауза
-	$("#pause").click(function(){ pause(zero_line_overflow()); }); //overflow для того чтобы пауза не отжималась по окончании игры
-	$(".pause").click(function(){ pause(zero_line_overflow()); }); //overflow для того чтобы пауза не отжималась по окончании игры
+	//функция на кнопке внизу
+	$("#pause").click(function() { pause(zero_line_overflow()); }); //overflow для того чтобы пауза не отжималась по окончании игры
+	//функция на кнопке в телефонном режиме
+	$(".pause").click(function() { pause(zero_line_overflow()); }); //overflow для того чтобы пауза не отжималась по окончании игры
+	//пауза на нажатии "Esc"
+	window.addEventListener('keydown', function(e) {if (e.key == 'Esc') pause(zero_line_overflow());})
 
 		$("#left").click(function() { if (move_down) direct('left',z_object); }); //move_down проверяет в процессе ли движение игры
 		$("#right").click(function() { if (move_down) direct('right',z_object); }); //move_down проверяет в процессе ли движение игры
 		$("#flip").click(function() { if (move_down) rotate_index = rotater(z_object,rotate_index); }); //move_down проверяет в процессе ли движение игры
-		$("#down").click(function() {	if (move_down) fast_down(5); }); //move_down проверяет в процессе ли движение игры
-		$(".box").click(function() {	if (move_down) fast_down(colrow); }); //при касании на игровой экран, объект "слетает вниз"
+		$("#down").click(function() { if (move_down) fast_down(5); }); //move_down проверяет в процессе ли движение игры
+		$(".box").click(function() { if (move_down) fast_down(col_row); }); //при касании на игровой экран, объект "слетает вниз"
 
 	//считывание клавиатуры
 	window.addEventListener('keydown', function(e)
@@ -10717,7 +10722,7 @@ $(document).ready(function() {
 			if (e.key == 'ArrowRight') direct('right',z_object);//направо
 			if (e.key == 'ArrowUp') rotate_index = rotater(z_object,rotate_index); //кнопка поворота объекта
 			if (e.key == 'ArrowDown') fast_down(5);//кнопка ускорения
-			if (e.key == ' ') fast_down(colrow);//кнопка максимального ускорения
+			if (e.key == ' ') fast_down(col_row);//кнопка максимального ускорения
 		}
 
 		if (e.key == 'Escape') pause(zero_line_overflow()); //пауза
@@ -10733,17 +10738,18 @@ $(document).ready(function() {
 
 /////функция для зачистки пространства перед новой игрой и нового/первого запуска/////////
 function new_game()
-	{
-		onoff = true;//показываем что new_game в деле
-		$('body').css('backgroundColor','black');//затемнение остального пространства
-		$('.dot').css('opacity','1');//возврат к нормальному виду если была пауза
-		line_control_array(true);//зачищаем основное пространство
-		score = 0;//зачистка количества очков
-		line_counter_display(score);//вывод очков
-		active_z();//активация первой фигуры
-		clearInterval(timer);//сброс таймера движения
-		move_down = auto_down(speed); //активация движения
-	}
+{
+	on_off = true;//показываем что new_game в деле
+	$('body').css('backgroundColor','black');//затемнение остального пространства
+	$('footer').css('display','none'); //убираем инструкции внизу для комфортной игры без скролов
+	$('.dot').css('opacity','1');//возврат к нормальному виду если была пауза
+	line_control_array(true);//зачищаем основное пространство
+	score = 0;//зачистка количества очков
+	line_counter_display(score);//вывод очков
+	active_z();//активация первой фигуры
+	clearInterval(timer);//сброс таймера движения
+	move_down = auto_down(speed); //активация движения
+}
 
 ///////////////////Функция ПАУЗЫ//////////////////////////////////////////
 function pause(overflow)//overflow логическая функция для проверки конца игры передаётся в паузу
@@ -10751,11 +10757,11 @@ function pause(overflow)//overflow логическая функция для п
 	if (move_down)
 	{
 		move_down = false;
-		clearInterval(timer);//сброс запущеной функции таймера
+		clearInterval(timer);//сброс запущеной функции таймера для возобновления ОДНОГО движения
 		$('.dot').css('opacity','0.2');//"затемнение" на паузе
 		$('body').css('backgroundColor','rgb(25, 82, 138)');// восстановление цвета заднего фона
 	}
-	else if ((onoff) && !(overflow)) //если конец игры, то с паузы не снимается
+	else if ((on_off) && !(overflow)) //если конец игры, то с паузы не снимается
 	{
 		move_down = auto_down(speed); //true
 		$('.dot').css('opacity','1');//возврат к нормальному виду
@@ -10835,7 +10841,7 @@ function active_z()
 		}
 	//прорисовка следующей фигуры
 	for (var i=0; i < 4; i++)
-		colored($(".dot").get(figure[figure_index][i]+(colrow*7)+10), color_light);
+		colored($(".dot").get(figure[figure_index][i]+(col_row*7)+10), color_light);
 }
 
 ///////////////--Поворот объекта--//////////////////////////
@@ -10871,8 +10877,8 @@ function rotater(what_rotate, rotate_index_in)
 ////////////////--Перемещение объектов--///////////////////////////////
 function direct(to, what)
 {
-	var move_it =  (to == 'down') ? colrow : //значение смещения вниз
-				(to == 'up') ? -colrow : //значение смещения вверх (для корректировки появляющихся фигур)
+	var move_it =  (to == 'down') ? col_row : //значение смещения вниз
+				(to == 'up') ? -col_row : //значение смещения вверх (для корректировки появляющихся фигур)
 				(to == 'left') ? -1 : 1; //либо налево/направо
 	//адаптация перемещения в массив для функции проверки препятствий
 	var move_it_array=[move_it,move_it,move_it,move_it];
@@ -10895,7 +10901,6 @@ function direct(to, what)
 	if ((move_it_array[0] == 0) && to == 'down') //если сработало обнуление массива при передвижении вниз
 		//то запускается функция обработки конца движения объекта
 		end_of_movement(what);
-
 }
 
 ////////////////функция автозапуска падения блока//////////////////////////
@@ -11019,7 +11024,7 @@ function interface_next_figure_clear()
 {
 	for (var i = 7; i < 11; i++)
 		for (var j = 12; j < 19; j++)
-			colored($(".dot").get(j+i*colrow), color_dark);//перекрашивание поля в цвет фона
+			colored($(".dot").get(j+i*col_row), color_dark);//перекрашивание поля в цвет фона
 }
 
 ///////////функция вывода количества собранных линий////////////////
@@ -11042,13 +11047,14 @@ function game_over_output(overflow)
 	{
 		pause(overflow);//постановка на паузу без вожможности снять с неё
 
-		var title= "GAME"
+		var title= "GAME";
 		for (var i = 0; i < title.length; i++)
 		$($(".dot").get(i+292)).html(title[i]);
 		title = "OVER"
 		for (var i = 0; i < title.length; i++)
 		$($(".dot").get(i+315)).html(title[i]);
-		//alert("GAME OVER! \n You`re score is "+score+" lines."); //вывод сообщения
+		//опция - вывод сообщения "Game Over" отдельно
+		//alert("GAME OVER! \n You`re score is "+score+" lines.");
 	}
 	return overflow;
 }
