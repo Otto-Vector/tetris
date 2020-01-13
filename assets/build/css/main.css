@@ -1,3 +1,7 @@
+input, button, select {
+  outline: 0;
+  border: none; }
+
 body {
   background-color: #19528a;
   font-family: arial;
