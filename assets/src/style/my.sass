@@ -18,7 +18,7 @@ body
 
 header
 	display: flex
-	padding-top: 30px
+	padding-top: 2%
 	justify-content: center
 	display: none
 
@@ -28,7 +28,7 @@ header
 #container
 	display: flex
 	justify-content: space-around
-	padding-top: 30px
+	padding-top: 2%
 	#center //хитрый
 		width: 520px
 		font-size: 18px
@@ -170,10 +170,3 @@ footer
 	#left, #right, #flip, #down
 		height: 50px
 		width: 50px
-
-
-@for $i from 9 to 5 //способ сохранить квадрат по высоте
-	@media screen and (max-height: $i*50px+50px)
-		#container #center
-			width: $i*50px
-			font-size: $i*2px-2px
