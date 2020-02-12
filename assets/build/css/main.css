@@ -181,3 +181,8 @@ footer {
   #left, #right, #flip, #down {
     height: 50px;
     width: 50px; } }
+
+@media screen and (max-height: 500px) {
+  #container #center {
+    width: 90vh;
+    font-size: 3vh; } }
