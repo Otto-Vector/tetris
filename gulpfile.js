@@ -97,16 +97,16 @@ gulp.task('jade:build', function() {
     .pipe(webserver.reload({ stream: true })); // перезагрузка сервера
 });
 
-//сборка PHP пакетов
-gulp.task('php:build', function () {
-    return gulp.src(path.src.php) // выбор всех html файлов по указанному пути
-//        .pipe(plumber()) // отслеживание ошибок
-//        .pipe(rigger()) // импорт вложений
-//        .pipe(phpmin())//минификация php (использует стандарт ES6)
-//        .pipe(htmlmin({ collapseWhitespace: true }))//минификация тэгов html
-        .pipe(gulp.dest(path.build.php)) // выкладывание готовых файлов
-        .pipe(webserver.reload({ stream: true })); // перезагрузка сервера
-});
+// //сборка PHP пакетов
+// gulp.task('php:build', function () {
+//     return gulp.src(path.src.php) // выбор всех html файлов по указанному пути
+// //        .pipe(plumber()) // отслеживание ошибок
+// //        .pipe(rigger()) // импорт вложений
+// //        .pipe(phpmin())//минификация php (использует стандарт ES6)
+// //        .pipe(htmlmin({ collapseWhitespace: true }))//минификация тэгов html
+//         .pipe(gulp.dest(path.build.php)) // выкладывание готовых файлов
+//         .pipe(webserver.reload({ stream: true })); // перезагрузка сервера
+// });
 
 
 // сбор стилей
@@ -188,11 +188,11 @@ gulp.task('build',
         gulp.parallel(
             'jade:build',
             'html:build',
-            'php:build',
             'css:build',
             'js:build',
+            'image:build',
+//             'php:build',
 //            'fonts:build',
-           'image:build',
 //            'json:build',
         )
     )
@@ -204,10 +204,10 @@ gulp.task('watch', function () {
     gulp.watch(path.watch.html, gulp.series('html:build'));
     gulp.watch(path.watch.css, gulp.series('css:build'));
     gulp.watch(path.watch.js, gulp.series('js:build'));
-   gulp.watch(path.watch.img, gulp.series('image:build'));
+    gulp.watch(path.watch.img, gulp.series('image:build'));
 //    gulp.watch(path.watch.fonts, gulp.series('fonts:build'));
 //    gulp.watch(path.watch.json, gulp.series('json:build'));
-    gulp.watch(path.watch.php, gulp.series('php:build'));
+//    gulp.watch(path.watch.php, gulp.series('php:build'));
 });
 
 // задача по умолчанию

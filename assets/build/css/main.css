@@ -167,8 +167,6 @@ footer {
   display: none; }
 
 @media (min-width: 1024px) {
-  #left, #right, #flip, #down, .start, .pause {
-    display: none; }
   footer {
     display: block; }
   header {
